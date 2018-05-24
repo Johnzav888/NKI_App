@@ -1,3 +1,15 @@
+ipak <- function( pkg ){  # Check if the packages are installed, and if not install them. Finally load them!
+  new.pkg <- pkg[!( pkg %in% installed.packages()[, "Package"] ) ]
+  if ( length( new.pkg ) ) 
+    install.packages(new.pkg, dependencies = TRUE )
+  sapply( pkg, require, character.only = TRUE )
+}
+
+# usage
+packages <- c( "shiny", "ggplot2", "dplyr", "shinyjs", "shinythemes","plotly","samplesize","fBasics", "DT", "survival")
+ipak( packages )
+
+
 library(shiny)
 library(ggplot2)
 library(dplyr)
