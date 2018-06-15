@@ -189,21 +189,21 @@ server <- function(input, output){
     
   #})
   
-  output$Example_1 <- DT::renderDataTable({DT::datatable(matrix(c(1:10, 288.67, 286.39, 295.82, 282.82, 264.21, 265.69, 266.26, 291.32, 260.67, 253.03,
+  output$Example_1 <- renderDT(matrix(c(1:10, 288.67, 286.39, 295.82, 282.82, 264.21, 265.69, 266.26, 291.32, 260.67, 253.03,
                                                                   rep("Control", 5), rep("Treatment", 5)), ncol = 3),
                                                          colnames = c("ID", "HDL-level", "Group"),
                                                          selection = 'none',
                                                          options = list(lengthMenu = c(5, 5, 5), pageLength = 10,
-                                                                        dom = 't'))})
+                                                                        dom = 't',lengthChange = FALSE))
   
   
-  output$Example_2 <- DT::renderDataTable({DT::datatable(matrix(c(1:15, 288.67, 286.39, 295.82, 282.82,264.21,265.69, 266.26, 291.32, 260.67, 253.03,
+  output$Example_2 <- renderDT(matrix(c(1:15, 288.67, 286.39, 295.82, 282.82,264.21,265.69, 266.26, 291.32, 260.67, 253.03,
                                                                   257.50, 240.63, 263.98, 264.81, 255.51,
                                                                   rep("Control", 5), rep("Treatment A", 5), rep("Treatment B", 5)), ncol = 3),
                                                          colnames = c("ID", "HDL-level", "Group"),
                                                          selection = 'none',
                                                          options = list(lengthMenu = c(5, 5, 5), pageLength = 15,
-                                                                        dom = 't'))})
+                                                                        dom = 't', lengthChange = FALSE))
   
   
   powers <- eventReactive(input$buttonInput,{ 
@@ -335,6 +335,8 @@ sample_sizeSurv <- reactive({
                                                                                                              
 }) 
 
+
+
 output$resultsSurv <- renderPrint({sample_sizeSurv()})
 
 sample_sizeSurv2 <- reactive({
@@ -380,13 +382,13 @@ output$ExampleSurv <- renderUI({
 })
 
 
-output$Surv_Example_1 <- DT::renderDataTable({DT::datatable(matrix(c(1:20, 15,16,23,23,23,28,30,32,32,35,14,14,28,28,32,35,35,38,46,58,
+output$Surv_Example_1 <- renderDT(matrix(c(1:20, 15,16,23,23,23,28,30,32,32,35,14,14,28,28,32,35,35,38,46,58,
                                                                      rep(1,10), 0,0, rep(1,7), 0,
                                                                      rep("Vehicle", 10), rep("Treatment", 10)), ncol = 4),
                                                        colnames = c("ID","Days", "Status", "Group"),
                                                        selection = 'none',
                                                        options = list(lengthMenu = c(5, 5, 5), pageLength = 20,
-                                                                      dom = 't'))})
+                                                                      dom = 't'))
 
 
 
@@ -411,14 +413,14 @@ output$Surv_Example_3 <- renderPrint({
 })
 
 
-output$Surv_Example_4 <- DT::renderDataTable({DT::datatable(matrix(c(1:39, 29, 37, 37, 29, 29, 39, 50, 37, 41, 36, 37, 37, 29, 44, 32, 34, 26, 34, 21, 30, 21, 58, 34, 49, 48, 
+output$Surv_Example_4 <- renderDT(matrix(c(1:39, 29, 37, 37, 29, 29, 39, 50, 37, 41, 36, 37, 37, 29, 44, 32, 34, 26, 34, 21, 30, 21, 58, 34, 49, 48, 
                                                                      69, 11, 67, 44, 51, 60, 71, 57, 66, 58, 63, 67, 43, 57, 
                                                                      rep(1,26), 0, rep(1,12),
                                                                      rep("Control", 21), rep("Treatment", 18)), ncol = 4),
                                                             colnames = c("ID","Days", "Status", "Group"),
                                                             selection = 'none',
                                                             options = list(lengthMenu = c(5, 5, 5), pageLength = 40,
-                                                                           dom = 't'))})
+                                                                           dom = 't'))
 
 
 
@@ -439,5 +441,40 @@ output$Surv_Example_6 <- renderPrint({
   wilcox.test(Days ~ Group, data = mydataSurv2)
   
 })
+
+
+
+output$sdynamic_valueA1 <- renderPrint({
+  cat(input$MedAInput)})
+
+
+output$sdynamic_valueHR1 <- renderPrint({
+  cat(input$MedBInput/input$MedAInput)})
+
+output$sdynamic_valueFT1<- renderPrint({
+  cat(input$FTInput)})
+
+output$sdynamic_valueP1 <- renderPrint({
+  cat(input$PowerInputS)})
+
+output$sdynamic_valueAlp1 <- renderPrint({
+  cat(input$errorInputS)})
+
+
+output$sdynamic_valueA <- renderPrint({
+  cat(input$MedA1Input)})
+
+
+output$sdynamic_valueHR <- renderPrint({
+  cat(input$MedB1Input/input$MedA1Input)})
+
+output$sdynamic_valueFT <- renderPrint({
+  cat(input$FT1Input)})
+
+output$sdynamic_valueP <- renderPrint({
+  cat(input$Power1InputS)})
+
+output$sdynamic_valueAlp <- renderPrint({
+  cat(input$error1InputS)})
 
 }

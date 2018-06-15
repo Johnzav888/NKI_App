@@ -31,25 +31,26 @@ library(survival)
 #saveRDS(withBusyIndicatorServer, file = "shinyhelper2")
 
 source("Helpers.R")
+options(shiny.launch.browser = .rs.invokeShinyWindowViewer)
 
 
 ui <- tagList(
   tags$head(
     tags$script("src"="app.js")
-  ), fluidPage(navbarPage(theme=shinytheme("spacelab"), title = div(h4("Power Calculations", 
-                                                                        style = "font-family: 'Lobster', cursive;
-                                                                        font-weight: 500; line-height: 1.1; 
-                                                                        color: #e8ea0f;"), img(src = "images/logo-AVL.jpg", height = "50px", width = "120px",
-                                                                                               style = "position: relative; top: -3px; right: -1200px;")) 
-                           , fluid = TRUE,  windowTitle = "Power Calculations",
+  ), fluidPage(navbarPage(theme=shinytheme("spacelab"), title = div(img(src = "images/logo-AVL.jpg", height = "40px", width = "120px"
+                                                                        ))#, h4("NKI_statistics", 
+                                                                         #style = "font-family: 'Lobster', cursive;
+                                                                        #font-weight: 500; line-height: 1.1; 
+                                                                        #color: #e8ea0f;")) 
+                           , fluid = FALSE, windowTitle = "NKI_statistics", 
                            tabPanel("Design for mice experiments", value = "StartPage",
                                     
                                                HTML(paste0("<br/>", "<br/>","<br/>",
-                                                    "The purpose of this app is to help researchers conducting mice experiments in the Netherlands Cancer Institute
+                                                    "<center>The purpose of this app is to help researchers conducting mice experiments in the Netherlands Cancer Institute
                                                     with respect to statistical aspects of the studies. One can find here some explanations of basic
                                                     statistical tests that can be applied to illustrate data or calculate sample size and power
                                                     of future experiments. The latter is vital and must be taken into consideration when an 
-                                                    experiment is designed, because:",
+                                                    experiment is designed, because:</center>",
                                                     "<br/>", "<br/>","<br/>",
                                                     "<i><center><strong> More power increases confidence about results, either significant or not </strong></center></i>",
                                                     "<br/>", "<br/>","<br/>",
@@ -72,7 +73,7 @@ ui <- tagList(
                                       own experiment. When you find it follow the link that is provided in order to be transferred to the relevant page.")),
                           
                           HTML(paste0("<br/>", "<br/>","<br/>",
-                                      "<i><strong><font color='red'> Mean/Medians Comparison </font></strong></i>",
+                                      "<i><strong><font color='red'> Means/Medians Comparison </font></strong></i>",
                                       "<br/>", "<br/>","<br/>",
                                       "<i>Example:</i> A scientist wants to test the hypothesis that a novel compound had a beneficial effect on reducing high-density lipoprotein (HDL) cholesterol levels 
                                       in a transgenic C57Bl/6J strain of mice. Therefore she randomizes half of the mice to control group and the other half to treatment group, 
@@ -111,9 +112,9 @@ ui <- tagList(
                             in order to compare average HDL cholesterol levels from the two groups",
                           "<br/>", "<br/>","<br/>")),
   
-                      tags$a("Link", onclick = "customHref('Page6');")),
+                      tags$a("Link", onclick = "customHref('Page6');"),
   
-  
+                      HTML(paste0("<br/>", "<br/>","<br/>"))),
               
        tabPanel("Fundamentals - Power", value = "Page2",
                                     withMathJax(),
@@ -137,7 +138,7 @@ ui <- tagList(
                                                       })</script>"),
                                                  
                                                  HTML(paste0(
-                                                   "<br/>",
+                                                   "<br/>","<br/>","<br/>",
                                                    "Power is the probability of finding an effect that is actually true. That is, having a significant
                                                    result while the null hypothesis is actually false. It is the complement of Type-II error, \\(\\beta\\) = 1 - Power, which in turn is the
                                                    probability of a false negative result, that is the probability of not rejecting the null hypothesis while it is false",
@@ -159,12 +160,12 @@ ui <- tagList(
                                                    "* More Power increases chances of replicating prior findings",
                                                    "<br/>",
                                                    "* More Power increases confidence about results, either significant or not",
-                                                   "<br/>"),
+                                                   "<br/>",
                                                    "<br/>", "<br/>", "<br/>",
                                                    "For intuition the following example can be considered. A scientist who performs 100 experiments in their carreer and hypotherically half of them
                                                    are about a true null hypothesis and the other half about a false null hypothesis, and assuming a statistical power of 80% and Type-I error(\\(\\alpha\\)=5%),
                                                    they will be able to capture 40 out of those 50 false null hypothesis. Instead, with a constant power of 50% across their experiments, the will manage to
-                                                   identify only 25 out of the 50."),
+                                                   identify only 25 out of the 50.")),
                                                  
                                                  HTML(paste0(
                                                    "<br/>", "<br/>",
@@ -231,7 +232,8 @@ ui <- tagList(
                                                              "For instance, with a power=0.2 we reject very difficult the null hypothesis and therefore, if the prior probability of the null hypothesis being false is high,
                                                              we increase the probability of falsely not rejecting it, which means that type-II error(fail to detect the effect) is more influential in this case. But if however, the 
                                                              prior probability of the null hypothesis is low, then the probability of false non-rejection is also low and the % of false conclusions is weighted more by the type-I error
-                                                             (finding a significant effect where there is none)."))
+                                                             (finding a significant effect where there is none).",
+                                                            "<br/>", "<br/>", "<br/>"))
                                                  ),
                                        
                                         
@@ -256,7 +258,7 @@ ui <- tagList(
                                                  
                                                  HTML(paste0("<br/>", "<br/>", "<br/>", "<br/>",
                                                              "<i><strong><font color='red'>What do I need ?</font></strong></i>",
-                                                             "<br/>",
+                                                             "<br/>","<br/>","<br/>",
                                                              "To determine the power of an analysis we need firstly to specify the alternative Hypothesis, Ha, or in other words,
                                                              the effect size that we are interesting in detecting. Further, and for most of analyses, power is proportional to the following:",
                                                              "<br/>", "<br/>",
@@ -277,7 +279,7 @@ ui <- tagList(
                                                              "<br/>", "<br/>", "<br/>", "<br/>", "<br/>")),
                                                  
                                                  HTML(paste0("<i><strong><font color='red'>Order of actions</font></strong></i>",
-                                                             "<br/>",
+                                                             "<br/>","<br/>","<br/>",
                                                              "When a researcher is designing an experiment it is highly advised to follow the next steps.",
                                                              "<br/>","<br/>",
                                                              "1. Formulate the null hypothesis. That is, define clearly what is the hypothesis that is going to be tested in the experiment.",
@@ -353,7 +355,8 @@ ui <- tagList(
                                                              "<br/>", "<br/>", "<br/>",
                                                              "Choosing a one-tailed test for the sole purpose of attaining significance is not appropriate.  Choosing a one-tailed test after running a two-tailed test
                                                              that failed to reject the null hypothesis is not appropriate, no matter how 'close' to significant the two-tailed test was.
-                                                             Using statistical tests inappropriately can lead to invalid results that are not replicable and highly questionable"))
+                                                             Using statistical tests inappropriately can lead to invalid results that are not replicable and highly questionable",
+                                                             "<br/>","<br/>","<br/>"))
                                                  
                                                  
                                                  
@@ -362,7 +365,8 @@ ui <- tagList(
                                         
                                         
                                         tabPanel("Softwares for Sample size and power calculation",
-                                                 HTML("<center><strong>G*Power: Statistical Power Analyses for Windows and Mac</strong></center>"),
+                                                 HTML(paste0("<br/>","<br/>","<br/>",
+                                                      "<center><strong>G*Power: Statistical Power Analyses for Windows and Mac</strong></center>")),
                                                  
                                                  HTML(paste0("<br/>","<br/>",
                                                              "G*Power is a tool to compute statistical power analyses for many different t tests, F tests, t tests, z tests and some exact tests. 
@@ -371,18 +375,17 @@ ui <- tagList(
                                                              "G*Power is a freely available software and currently it is condidered one of the best for power calculations.
                                                              More information about it, such as a manual, as well as guidelines about how to download it can be found in the following link:",
                                                              "<br/>",
-                                                             a("G*Power link", href="http://www.gpower.hhu.de/", target = "_blank"),
-                                                             "<br/>", "<br/>", "<br/>", "<br/>",
-                                                             "Some guidelines are provided also here for each test in the associated tab"
+                                                             a("G*Power link", href="http://www.gpower.hhu.de/", target = "_blank")
+
                                                  ))))
                                                  ),
                           
-                           tabPanel("Wilcoxon ranks-sum test",  value = "Page4",
+                           tabPanel("Means/Medians Comparison",  value = "Page4",
                                     withMathJax(),
                                     tabsetPanel(
                                       
                                       tabPanel("Basic information",
-                                               HTML(paste0("<br/>",
+                                               HTML(paste0("<br/>","<br/>", "<br/>",
                                                            "A T-test or Wilcoxon-Mann-Whitney test can be used for comparison of two groups, while an ANOVA or Kruskal-Wallis test can be used for comparison of more than two groups.
                                                            based on mean or median values of the outcome.
                                                            T-test and ANOVA are parametric tests that rely on certain assumptions and these assumptions need to be met to get reliable test results. Validation of these assumptions
@@ -406,13 +409,15 @@ ui <- tagList(
                                                
                                       
                                       tabPanel("Example", value = 'Example_means',
-                                               HTML("<center><i><strong><font color='blue'>For 2 groups</font></strong></i></center>"),
+                                               HTML(paste0("<br/>","<br/>","<br/>",
+                                                           "<center><i><strong><font color='blue'>For 2 groups</font></strong></i></center>")),
                                                h5("Example:"),
                                                HTML("A scientist wants to test the hypothesis that a novel compound had a beneficial effect on reducing high-density lipoprotein (HDL) cholesterol levels 
                                       in a transgenic C57Bl/6J strain of mice. Therefore she wants to conduct a new study by randomizing mice to control treatment groups, in order to compare the average HDL 
                                       cholesterol levels from the two groups. From a previous experiment, following measurements of HDL are observed:",
                                                "<br/>", "<br/>","<br/>"),
-                                               DT::dataTableOutput("Example_1"),
+                                               fluidRow(
+                                                 column(6, DTOutput("Example_1"))),
                                                
                                                HTML("<br/>", "<br/>","<br/>",
                                                     "These data can be used to calculate power and required sample size for The new experiment. The following information from the 
@@ -435,7 +440,8 @@ ui <- tagList(
                                       in a transgenic C57Bl/6J strain of mice. Therefore she wants to conduct a new study by randomizing mice to control and two treatment groups, in order to compare the average HDL 
                                       cholesterol levels from the three groups. From a previous experiment, following measurements of HDL are observed:",
                                                     "<br/>", "<br/>","<br/>"),
-                                               DT::dataTableOutput("Example_2"),
+                                               fluidRow(
+                                                 column(6, DTOutput("Example_2"))),
                                                HTML("<br/>", "<br/>","<br/>",
                                                     "In case of more than two groups, for the power calculation we use information about two groups with the
                                                     smallest difference because a larger sample is required to detect a smaller effect. If an experiment is powered for 
@@ -560,11 +566,11 @@ ui <- tagList(
                                       tabPanel("Wilcoxon ranks-sum test description")
                                       )), 
                                         
-                                      tabPanel("Log-rank test", value = "Page5",
+                                      tabPanel("Survival Analysis", value = "Page5",
                                                useShinyjs(),
                                                withMathJax(),
                                                tabsetPanel(
-                                                 tabPanel("Basic information", htmlOutput("tutorialSurv")
+                                                 tabPanel("Basic information", HTML(paste0("<br/>","<br/>","<br/>")), htmlOutput("tutorialSurv")
                                                           #withMathJax(htmlOutput("formulaSurv")),
                                                           #h4("where:"),
                                                           #helpText("\\(\\bar{x}_{1}\\): The mean of sample 1"),
@@ -581,14 +587,16 @@ ui <- tagList(
                                                           ),
                                                  
                                                  tabPanel("Example", value = 'Example_surv', 
+                                                          HTML(paste0("<br/>","<br/>","<br/>")),
                                                           
                                                           htmlOutput("ExampleSurv"),
-                                                          
-                                                          DT::dataTableOutput("Surv_Example_1"),
-                                                          
-                                                          HTML("For the power calculation based on a logrank test information on  the proportions of  surviving  until a particular time point  is required. 
+                                                          fluidRow(
+                                                            column(6, DTOutput("Surv_Example_1"))),
+
+                                                          HTML(paste0("<br/>", "<br/>","<br/>",
+                                                              "For the power calculation based on a logrank test information on  the proportions of  surviving  until a particular time point  is required. 
                                                                 Moreover, information on accrual time and total experiment time is needed.  The accrual time is the duration of time of mice enrolment into the study,
-                                                                which is equal to zero  when all mice are included in the experiment at the same time.  The total experiment time is the planned duration of the experiment. 
+                                                                which is equal to one  when all mice are included in the experiment at the same time.  The total experiment time is the planned duration of the experiment. 
                                                                Further, the <font color = 'red'>power level</font> and the <font color = 'red'>significance level</font> (\\(\\alpha\\)) of the test, or in other words the desired Type-I error, need to be specified.  
                                                                 Usually, power is set to 80% and \\(\\alpha\\) to 5%.",
                                                                "Therefore, we need:",
@@ -602,7 +610,7 @@ ui <- tagList(
                                                                <li>	Significance level </li>
                                                                </ol>",
                                                                "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"
-                                                               )
+                                                               ))
                                                           
                                                           ),
                                                  
@@ -621,8 +629,7 @@ ui <- tagList(
                                                               HTML("<br/>", "<br/>","<br/>",
                                                                    "Here it is an example of how this app can be used in order to perform power calculations. 
                                                                    In the left side, there is a panel where you can provide the input that is required for it,
-                                                                   and the results will appear in the right side(it might take a couple of seconds).
-                                                                   Along with that, a plot will also be provided with a range of possible sample sizes and their associated power values.",
+                                                                   and the results will appear in the right side.",
                                                                    "<br/>", "<br/>","<br/>", 
                                                                    "For illustration, we will use the example that we saw"),
                                                               tags$a("Here", onclick = "customHref('Example_surv');"),
@@ -636,10 +643,24 @@ ui <- tagList(
                                                                    </ol>",
                                                                    "<br/>", "<br/>","<br/>",
                                                                    "Finally, we specify \\(\\alpha\\) at 5% and the desired power to be 80%."),
-                                                              
-                                                              h4("The sample size per group is:",  style = "font-family: 'Lobster', cursive;
+                                                              HTML("<br/>", "<br/>","<br/>", 
+                                                                   "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
+                                                              uiOutput('sdynamic_valueP1',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>%power at a </font></strong> "),
+                                                              uiOutput('sdynamic_valueAlp1',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>significance level to detect a hazard ration of </font></strong> "),
+                                                              uiOutput('sdynamic_valueHR1',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>when the control group median survival is</font></strong>"),
+                                                              uiOutput('sdynamic_valueA1',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>for a study that lasts for</font></strong>"),
+                                                              uiOutput('sdynamic_valueFT1',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>time periods of which subjects accrual(entry) occurs in the first time period,</font></strong>"),
+                                                              HTML("<br/>", "<br/>","<br/>"),
+                                                              h4("The required sample size per group is:",
+                                                                 style = "font-family: 'Lobster', cursive;
                                                                  font-weight: 500; line-height: 1.1; 
-                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsSurv'), 
+                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsSurv'),
+                                                              
                                                               br(), br(),
                                                               plotOutput("coolplotSurv")))
                                                           ),
@@ -656,15 +677,33 @@ ui <- tagList(
                                                             ),
                                                             
                                                             mainPanel(
-                                                              
-                                                              h4("The sample size per group is:",  style = "font-family: 'Lobster', cursive;
+                                                              HTML("<br/>", "<br/>","<br/>", 
+                                                                   "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
+                                                              uiOutput('sdynamic_valueP',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>%power at a </font></strong> "),
+                                                              uiOutput('sdynamic_valueAlp',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>significance level to detect a hazard ration of </font></strong> "),
+                                                              uiOutput('sdynamic_valueHR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>when the control group median survival is</font></strong>"),
+                                                              uiOutput('sdynamic_valueA',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>for a study that lasts for</font></strong>"),
+                                                              uiOutput('sdynamic_valueFT',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>time periods of which subjects accrual(entry) occurs in the first time period,</font></strong>"),
+                                                              HTML("<br/>", "<br/>","<br/>"),
+                                                              h4("The required sample size per group is:",
+                                                                 style = "font-family: 'Lobster', cursive;
                                                                  font-weight: 500; line-height: 1.1; 
-                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsSurv1'), 
+                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsSurv1'),
+                                                              
+                                                              #h4("The sample size per group is:",  style = "font-family: 'Lobster', cursive;
+                                                              #   font-weight: 500; line-height: 1.1; 
+                                                              #   color: #4d3a7d;"), verbatimTextOutput('resultsSurv1'), 
                                                               br(), br(),
                                                               plotOutput("coolplotSurv1")))
                                                           ),
                                                  tabPanel("Log-rank test description",
-                                                          HTML("In the data that from the example "),
+                                                          HTML(paste0("<br/>","<br/>","<br/>",
+                                                                      "In the data that from the example ")),
                                                           tags$a("here", onclick = "customHref('Example_surv');"),
                                                           HTML("we observe that all the mice in the control group have experienced the event of interest during the experiment, 
                                                                 while in the treatment group we have 3 mice that are censored. Two mice have died early but from reasons unrelated 
@@ -687,7 +726,8 @@ ui <- tagList(
                                                                "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>",
                                                               "Let's now consider another example.",
                                                               "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"),
-                                                          DT::dataTableOutput("Surv_Example_4"),
+                                                          fluidRow(
+                                                            column(6, DTOutput("Surv_Example_4"))),
                                                           HTML("<br/>", "<br/>","<br/>","<br/>",
                                                                 "Here we have 39 mice, 21 in control and 18 in treatment respectively, and all them have experienced the event except one mice in the treatment group
                                                                 which has died from other causes early in the study. We analyze these data again with both log-rank test and Wilcoxon."),
@@ -709,9 +749,8 @@ ui <- tagList(
                                                           
                                                  )),
                                                  
-                                      tabPanel("Longitudinal Analysis", value = "Page6"), inverse = T,collapsible = T
+                                      tabPanel("Growth Curve Analysis", value = "Page6"), inverse = T,collapsible = T
                            
                                                )))
   
-
 
