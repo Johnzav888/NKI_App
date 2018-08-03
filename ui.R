@@ -336,9 +336,9 @@ ui <- tagList(
                                                  
                                                  fluidRow(
                                                    column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                   tags$a(href="https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-what-are-the-differences-between-one-tailed-and-two-tailed-tests/", "Here "),
+                                                   tags$a("Here ", href="https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-what-are-the-differences-between-one-tailed-and-two-tailed-tests/", target="_blank"),
                                                    "and ",
-                                                   tags$a(href="http://www.statisticssolutions.com/should-you-use-a-one-tailed-test-or-a-two-tailed-test-for-your-data-analysis/", " here"),
+                                                   tags$a(href="http://www.statisticssolutions.com/should-you-use-a-one-tailed-test-or-a-two-tailed-test-for-your-data-analysis/", " here", target = "_blank"),
                                                            HTML(" , you can find more about this issue, and when it is appropriate to use one-sided test"),
                                                            "<br/>","<br/>","<br/>","<br/>","<br/>"
                                                                          
@@ -381,9 +381,11 @@ ui <- tagList(
                                                            Therefore,  the Wilcoxon-Mann-Whitney test can be used for those pairwise comparisons, in order to find the groups with significantly different median values of the outcome of interest.",
                                                            "<br/>","<br/>","<br/>")))),
                                                
-                                               tags$a(href="https://www.analyticsvidhya.com/blog/2017/11/a-guide-to-conduct-analysis-using-non-parametric-tests/", "Here"),
+                                               tags$a(href="https://www.analyticsvidhya.com/blog/2017/11/a-guide-to-conduct-analysis-using-non-parametric-tests/", "Here", target = "_blank"),
+                                               HTML(" and "),
+                                               tags$a(href="http://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704_nonparametric/BS704_Nonparametric4.html", "Here", target = "_blank"),
                                                
-                                               HTML(" , you can find more details about the Wilcoxon-Mann-Whitney test",
+                                               HTML(" , you can find more details about the Wilcoxon-Mann-Whitney test and non-parametric tests",
                                                "<br/>","<br/>","<br/>","<br/>","<br/>"),
                                                
                                                fluidRow(
@@ -393,7 +395,7 @@ ui <- tagList(
                                                            For an overall \\(\\alpha\\) of 0.05, i.e. a maximally 5% chance that at least one of the comparisons resulting  in a false positive conclusion, a significance level of \\(\\alpha\\)/(number of comparisons)=0.05/3=0.0167
                                                            for each pairwise test should be used.",
                                                            "<br/>","<br/>","<br/>",
-                                                           tags$a(href="http://www.biostathandbook.com/multiplecomparisons.html", "Here"),
+                                                           tags$a(href="http://www.biostathandbook.com/multiplecomparisons.html", "Here", target = "_blank"),
                                                            
                                                            HTML(" , you can find more about this and some alternative solutions to the multiple comparisons issue."),
                                                            "<br/>","<br/>","<br/>","<br/>","<br/>"))))
@@ -725,7 +727,7 @@ ui <- tagList(
                                                                         in other words, that their difference is equal to 0. The notation for the null hypothesis is H0: p1 = p2, where p1 is the proportion from the first population, and p2 is the proportion from the second population.",
                                                                         "<br/>","<br/>","<br/>"
                                                                                )))), 
-                                                          tags$a(href="https://www.dummies.com/education/math/statistics/how-to-compare-two-population-proportions/", "Here"),
+                                                          tags$a(href="https://www.dummies.com/education/math/statistics/how-to-compare-two-population-proportions/", "Here", target = "_blank"),
                                                           
                                                           HTML(" , you can find more details about the Z-test for proportions",
                                                                "<br/>","<br/>","<br/>","<br/>","<br/>")),
@@ -862,7 +864,8 @@ ui <- tagList(
                                                                       </ol>",
                                                                       "<br/>", "<br/>","<br/>",
                                                                       "The response in this experiment, tumor volume, is not normally distributes, and as it is usually done, we transformed it with the logarithmic function
-                                                                      in order to get a nicer normally distributed variable. And this will be used in the analysis.")))),
+                                                                      in order to get a nicer normally distributed variable. And this will be used in the analysis.",
+                                                                      "<br/>", "<br/>","<br/>")))),
                                                           fluidRow(
                                                             column(6, DTOutput("ExampleGC_1")))
                                                  ),
