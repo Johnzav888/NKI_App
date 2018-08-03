@@ -251,9 +251,9 @@ server <- function(input, output){
   powers2 <- eventReactive(input$button2Input,{ 
     withBusyIndicatorServer("button2Input", {
       
-      sapply(seq(50), function(x){
+      sapply(seq(100), function(x){
         tt <- replicate(500, wilcox.test(rnorm(x, input$meanAAA2Input, input$SDAAA2Input), rnorm(x, input$meanBBB2Input, input$SDBBB2Input))$p.value)
-        sum(tt < 0.05) / 500})
+        sum(tt < (input$error32Input / 100)) / 500})
     })
   })
   
@@ -261,7 +261,7 @@ server <- function(input, output){
     input$button2Input,{
       withBusyIndicatorServer("buttonInput", {
         
-        which(powers2() == min(powers2()[powers2() >= input$Power32Input]))
+        which(powers2() == min(powers2()[powers2() >= (input$Power32Input)/100]))
       })
     })
   
@@ -274,13 +274,12 @@ server <- function(input, output){
   pocoolplot32 <- eventReactive(input$button2Input,{
     withBusyIndicatorServer("buttonInput", {
       
-      qplot (seq(50), powers2(),
-             scale_y_continuous(breaks = seq(0, 1, 0.1)) +
-               scale_x_continuous(breaks = seq(1, 50), 1)) +
-        geom_hline(yintercept = input$Power32Input, col = "red") + 
+      qplot(seq(100), powers2()) +
+        coord_cartesian(ylim=c(0, 1))+     
+        geom_hline(yintercept = input$Power32Input/100, col = "red") + 
         geom_vline(xintercept = sample_size32(), col = "red") +
         ggtitle("Sample size and Power") +
-        labs(x = "Sample size", y = "Power")  
+        labs(x = "Sample size per group", y = "Power")  
     })
   })
   
@@ -326,31 +325,72 @@ server <- function(input, output){
   
   
   
-sample_sizeSurv <- reactive({
+#sample_sizeSurv <- reactive({
   
     
-(qnorm(input$errorInputS/2) + qnorm(1-input$PowerInputS))^2 * (log(input$MedBInput/input$MedAInput)^(-2))*
-    (2*(1 - ((1 - (exp(-log(2)/((input$MedAInput + input$MedBInput) / 2)))) / (log(2)/((input$MedAInput + input$MedBInput) / 2))) *
-          exp(-log(2)*input$FTInput/((input$MedAInput + input$MedBInput) / 2)))^(-1))  # Sample size
+#(qnorm(input$errorInputS/2) + qnorm(1-input$PowerInputS))^2 * (log(input$MedBInput/input$MedAInput)^(-2))*
+#    (2*(1 - ((1 - (exp(-log(2)/((input$MedAInput + input$MedBInput) / 2)))) / (log(2)/((input$MedAInput + input$MedBInput) / 2))) *
+#          exp(-log(2)*input$FTInput/((input$MedAInput + input$MedBInput) / 2)))^(-1))  # Sample size
                                                                                                              
-}) 
+#}) 
 
 
 
-output$resultsSurv <- renderPrint({sample_sizeSurv()})
+#output$resultsSurv <- renderPrint({sample_sizeSurv()})
 
 sample_sizeSurv2 <- reactive({
   
   
-  (qnorm(input$error1InputS/2) + qnorm(1-input$Power1InputS))^2 * (log(input$MedB1Input/input$MedA1Input)^(-2))*
+  (qnorm(((input$error1InputS)/100)/2) + qnorm(1-(input$Power1InputS)/100))^2 * (log(input$MedB1Input/input$MedA1Input)^(-2))*
     (2*(1 - ((1 - (exp(-log(2)/((input$MedA1Input + input$MedB1Input) / 2)))) / (log(2)/((input$MedA1Input + input$MedB1Input) / 2))) *
           exp(-log(2)*input$FT1Input/((input$MedA1Input + input$MedB1Input) / 2)))^(-1))  # Sample size
   
 }) 
 
+
 output$resultsSurv1 <- renderPrint({sample_sizeSurv2()})
 
 
+
+sample_sizeSurvplot <- reactive({
+  
+  j = 1
+  
+  pow <- seq(0.1, 0.9, by = 0.01)
+  n1 <- numeric(length(pow))
+  
+  for(i in 1:pow){
+  
+  n1[j] <- (qnorm(((input$error1InputS)/100)/2) + qnorm(1-i/100))^2 * (log(input$MedB1Input/input$MedA1Input)^(-2))*
+    (2*(1 - ((1 - (exp(-log(2)/((input$MedA1Input + input$MedB1Input) / 2)))) / (log(2)/((input$MedA1Input + input$MedB1Input) / 2))) *
+          exp(-log(2)*input$FT1Input/((input$MedA1Input + input$MedB1Input) / 2)))^(-1))  # Sample size
+  
+  j = j + 1
+  
+  }
+  
+  n1
+}) 
+
+
+
+Survcoolplot32 <- reactive({
+  
+  qplot(sample_sizeSurvplot(), seq(0.1, 0.9, by = 0.01)) +
+    coord_cartesian(ylim = c(0, 1)) +
+    xlim(c(1, 300)) +
+    geom_hline(yintercept = input$Power1InputS/100, col = "red") + 
+    geom_vline(xintercept = sample_sizeSurv2(), col = "red") +
+    ggtitle("Sample size and Power") +
+    labs(x = "Sample size per group", y = "Power")  
+  
+  }) 
+
+
+output$Survcoolplot33 <- renderPlot({
+  Survcoolplot32()    
+  
+})
 
 output$tutorialSurv <- renderUI({ 
   
@@ -477,4 +517,50 @@ output$sdynamic_valueP <- renderPrint({
 output$sdynamic_valueAlp <- renderPrint({
   cat(input$error1InputS)})
 
-}
+
+
+# Proportions 
+
+
+samsiz <- reactive({
+  
+  ceiling(power.prop.test(p1 = input$Prop1Input, p2 = input$Prop2Input, power = input$Power1InputP/100, sig.level = input$error1InputP/100)$n)
+  
+  
+})
+  
+output$resultsProp <- renderPrint({samsiz()})
+
+
+
+
+output$Pdynamic_valueP1 <- renderPrint({
+  cat(input$Prop1Input)})
+
+
+output$Pdynamic_valueP2 <- renderPrint({
+  cat(input$Prop2Input)})
+
+
+output$Pdynamic_valueDP1 <- renderPrint({
+  cat(input$Prop1Input - input$Prop2Input)})
+
+output$Pdynamic_valueALP<- renderPrint({
+  cat(input$error1InputP)})
+
+output$Pdynamic_valuePOW <- renderPrint({
+  cat(input$Power1InputP)})
+
+
+# Growth Curve 
+
+
+Mydata <- readRDS("WWW/data/Example_Marieke")
+output$ExampleGC_1 <- renderDT(Mydata,
+                               selection = 'none',
+                               options = list(lengthMenu = c(5, 5, 5), pageLength = 10,
+                                              lengthChange = FALSE))
+
+
+
+} ### END
