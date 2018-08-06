@@ -350,9 +350,26 @@ ui <- tagList(
                                                  
                                                  ),
                                         
-                                        
-                                        
-                                        tabPanel("Software for Sample size and power calculation",
+                                        tabPanel("References",
+                                                 fluidRow(
+                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                             "Below are provided links with some interesting articles, websites etc., where more information about statistcal power and p-value interpretation
+                                                             is given.")),
+                                                 HTML("<br/>","<br/>"),
+                                                 tags$a("The p value and the base rate fallacy", href = "https://www.statisticsdonewrong.com/p-value.html", target = "_blank"),
+                                                 HTML("<br/>","<br/>"),
+                                                 tags$a("Scientific method: Statistical errors", href = "https://www.nature.com/news/scientific-method-statistical-errors-1.14700", target = "_blank"),
+                                                 HTML("<br/>","<br/>"),
+                                                 tags$a("The fickle P value generates irreproducible results", href = "https://www.nature.com/articles/nmeth.3288", target = "_blank"),
+                                                 HTML("<br/>","<br/>"),
+                                                 tags$a("Observed power, and what to do if your editor asks for post-hoc power analyses", href = "http://daniellakens.blogspot.com/2014/12/observed-power-and-what-to-do-if-your.html", target = "_blank"),
+                                                 HTML("with some linked papers inside which are also very intersting","<br/>","<br/>"),
+                                                 tags$a("Statistical Considerations for Preclinical Studies", href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4466166/", target = "_blank"),
+                                                 HTML("<br/>","<br/>")))
+                                                 
+                                        ),
+
+                                                 tabPanel("Software for Sample size and power calculation",
                                                  HTML(paste0("<br/>","<br/>","<br/>",
                                                       "<center><strong>G*Power: Statistical Power Analyses for Windows and Mac</strong></center>")),
                                                  
@@ -850,7 +867,7 @@ ui <- tagList(
                                                                       the mouse dies or is sacrificed (when the tumor volume reaches 1500mm3). When tumors reach 200mm3, she randomizes half of the mice to the standard treatment and the other half to the new treatment,
                                                                       in order to compare the rate of tumor growth between groups.",
                                                                       "<br/>","<br/>","<br/>",
-                                                                      "From a previous experiment, the data is presented below. This kind of presentation is called long format, because each row corresponds to each measurement for each mouse, 
+                                                                      "Data from a previous experiment is presented below. This kind of presentation is called long format, because each row corresponds to each measurement for each mouse, 
                                                                       and hence, there are several rows per mouse equal to the total number of measurements for it. The other, and more familiar presentation of data, is called wide format, 
                                                                       where each row corresponds to each mouse, and the different measurements are presented as different columns. When working with longitudinal data, it is more 
                                                                       convenient to work with long format data, which is also how most software requires it to be. In this data, the columns are:",
@@ -863,7 +880,7 @@ ui <- tagList(
                                                                       <li>log_volume : log transformation of the tumor volume value</li>
                                                                       </ol>",
                                                                       "<br/>", "<br/>","<br/>",
-                                                                      "The response in this experiment, tumor volume, is not normally distributes, and as it is usually done, we transformed it with the logarithmic function
+                                                                      "The response in this experiment, tumor volume, is not normally distributed, and as it is usually done, we transformed it with the logarithmic function
                                                                       in order to get a nicer normally distributed variable. And this will be used in the analysis.",
                                                                       "<br/>", "<br/>","<br/>")))),
                                                           fluidRow(
