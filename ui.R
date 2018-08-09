@@ -10,16 +10,16 @@ packages <- c( "shiny", "ggplot2", "dplyr", "shinyjs", "shinythemes","plotly","s
 ipak( packages )
 
 
-library(shiny)
-library(ggplot2)
-library(dplyr)
-library(DT)
-library(shinyjs)
-library(shinythemes)
-library(plotly)
-library(samplesize)
-library(fBasics)
-library(survival)
+#library(shiny)
+#library(ggplot2)
+#library(dplyr)
+#library(DT)
+#library(shinyjs)
+#library(shinythemes)
+#library(plotly)
+#library(samplesize)
+#library(fBasics)
+#library(survival)
 #library(crayon)
 
 #library(shiny.router)
@@ -752,16 +752,30 @@ ui <- tagList(
                                                tabPanel("Example", value = 'Example_prop',
                                                         fluidRow(
                                                           column(8, HTML(paste0("<br/>","<br/>","<br/>", 
-                                                                                "A scientist wants to test the hypothesis that a new combination treatment is able to completely regress tumor. The response to treatment is assessed using the percentage of tumor volume change (ΔVol) 
-                                                                                at the final study day (i.e., seven days after the last treatment) compared with the baseline tumor volume at Day 0.
-                                                                                The criteria for response classification classification is based on some pre-defined criteria.
-                                                                                From a previous experiment, the proportions of complete responders for each group are: ",
-                                                                                "<br/>","<br/>","<br/>", 
-                                                                                "Group 1 – Standard Treatment :15%",
-                                                                                "<br/>",
-                                                                                "Group 2 – New Treatment : 55%",
+                                                                                "A scientist wants to test the hypothesis that a new combination treatment is able to completely regress tumor more efficiently compared with a control.
+                                                                                As complete responders are considered those mice
+                                                                                that do not have palpable tumors for 14 days. The proportions of complete responders are compared between treatment groups. 
+                                                                                A subset of the data from a previous experiment is presented below, where:",
+                                                                                "<br/>","<br/>","<br/>",
+                                                                                "<ol>
+                                                                                  <li><strong>ID</strong> : ID for each mouse</li>
+                                                                                  <li><strong>Treatment</strong> : group of treatment</li>
+                                                                                  <li><strong>Day #</strong> : Tumor volume in mm3 at the corresponding 
+                                                                                            day of measurement after the start of the treatment</li>
+                                                                                  <li><strong>CR</strong> : 1 if complete responder, 0 if not</li>
+                                                                                  </ol>",
                                                                                 
-                                                                                "<br/>","<br/>","<br/>", 
+                                                                                "<br/>","<br/>","<br/>",
+                                                                                "The <strong>NA's</strong> denote missing values, which in this case means that a mouse is dead and does not reach the end of the experiment.
+                                                                                And as can be seen in this particular example, there are more dead mice in the control group that in the treatment one.",
+                                                                                "<br/>","<br/>","<br/>")))), 
+                                                                                
+                                                                                fluidRow(
+                                                                                  column(12, DTOutput("ExamplePrp_1"))),
+                                                                                
+                                                        fluidRow(
+                                                          column(8, HTML(paste0("<br/>","<br/>","<br/>","<br/>","<br/>","<br/>", 
+                                                                                
                                                                                 "This information can be used to calculate the required sample size for the new experiment.
                                                                                 Further, the power level and the significance level  \\(\\alpha\\) of a test, or in other words, the desired Type-I error,
                                                                                 need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%")))),
@@ -782,8 +796,8 @@ ui <- tagList(
                                                HTML("<br/>", "<br/>","<br/>",
                                                     "For this particular example, we have:",
                                                     "<ol>
-                                                                   <li>Proportion in group 1 (Standard Treatment) = 15%</li>
-                                                                   <li>Proportion in group 2 (New Treatment) = 55% </li>
+                                                                   <li>Proportion in group A (Control) = 10%</li>
+                                                                   <li>Proportion in group B (New Treatment) = 30% </li>
                                                                    </ol>",
                                                     "<br/>", "<br/>","<br/>",
                                                     "Finally, we specify \\(\\alpha\\) at 5% and the desired power to be 80%.")
@@ -801,8 +815,8 @@ ui <- tagList(
                                                tabPanel("Power Calculation",
                                                         sidebarLayout(
                                                           sidebarPanel(
-                                                            numericInput( "Prop1Input", "Proportion in group A", 0.2, min = 0, max = 1 ),
-                                                            numericInput( "Prop2Input", "Proportion in group B", 0.7, min = 0, max = 1 ),
+                                                            numericInput( "Prop1Input", "Proportion in group A", 0.1, min = 0, max = 1 ),
+                                                            numericInput( "Prop2Input", "Proportion in group B", 0.3, min = 0, max = 1 ),
                                                             sliderInput( "Power1InputP", "Power", min = 0, max = 100, value = 80, step = 1),
                                                             sliderInput( "error1InputP", "Type I error", min = 0, max = 10, value = 5, step = 1)
                                                             
@@ -867,24 +881,28 @@ ui <- tagList(
                                                                       the mouse dies or is sacrificed (when the tumor volume reaches 1500mm3). When tumors reach 200mm3, she randomizes half of the mice to the standard treatment and the other half to the new treatment,
                                                                       in order to compare the rate of tumor growth between groups.",
                                                                       "<br/>","<br/>","<br/>",
-                                                                      "Data from a previous experiment is presented below. This kind of presentation is called long format, because each row corresponds to each measurement for each mouse, 
-                                                                      and hence, there are several rows per mouse equal to the total number of measurements for it. The other, and more familiar presentation of data, is called wide format, 
-                                                                      where each row corresponds to each mouse, and the different measurements are presented as different columns. When working with longitudinal data, it is more 
-                                                                      convenient to work with long format data, which is also how most software requires it to be. In this data, the columns are:",
+                                                                      "Data from a previous experiment is presented below. This kind of presentation is called <i>wide format</i>, and it is the most familiar data presentation, 
+                                                                      where each row corresponds to each mouse, and the different measurements are presented as different columns. { ( The following part will be removed probably and mentioned
+                                                                      in the tab with the explanation of the analysis) However, when working with longitudinal data, it is more 
+                                                                      convenient to work with another data presentation, called <i>long format</i>, where each row corresponds to each measurement for each mouse, 
+                                                                      and hence, there are several rows per mouse equal to the total number of measurements for it}. In this data, the columns are:",
                                                                       "<br/>", "<br/>","<br/>",
                                                                       "<ol>
-                                                                      <li>mouse : ID for each mouse</li>
-                                                                      <li>dag   : day of measurement after the start of the treatment</li>
-                                                                      <li>Volume: tumor volume in mm3</li>
-                                                                      <li>treatment: group of treatment</li>
-                                                                      <li>log_volume : log transformation of the tumor volume value</li>
+                                                                      <li><strong>ID</strong> : ID for each mouse</li>
+                                                                      <li><strong>Treatment</strong>: group of treatment</li>
+                                                                      <li><strong>Day X</strong> : Tumor volume in mm3 at the corresponding 
+                                                                                            day of measurement after the start of the treatment</li>
                                                                       </ol>",
                                                                       "<br/>", "<br/>","<br/>",
-                                                                      "The response in this experiment, tumor volume, is not normally distributed, and as it is usually done, we transformed it with the logarithmic function
-                                                                      in order to get a nicer normally distributed variable. And this will be used in the analysis.",
+                                                                      "The <strong>NA's</strong> denote missing values, which in this case means that a mouse is dead and does not reach the end of the experiment.
+                                                                      And as can be seen in this particular example, there are more dead mice in the control group that in the treatment one.",
+                                                                      
                                                                       "<br/>", "<br/>","<br/>")))),
                                                           fluidRow(
-                                                            column(6, DTOutput("ExampleGC_1")))
+                                                            column(12, DTOutput("ExampleGC_1"))),
+                                                          
+                                                          fluidRow(
+                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>"))))
                                                  ),
                                                  tabPanel("Power Calculation"))), inverse = T, collapsible = T
                            

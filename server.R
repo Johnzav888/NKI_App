@@ -552,14 +552,23 @@ output$Pdynamic_valuePOW <- renderPrint({
   cat(input$Power1InputP)})
 
 
+
+MydataP <- readRDS("WWW/data/Example_Prop")
+output$ExamplePrp_1 <- renderDT(MydataP,
+                               selection = 'none',  rownames = FALSE,
+                               options = list(lengthMenu = c(5, 5, 5), pageLength = 10,  
+                                              lengthChange = FALSE, dom = 't'), server = FALSE)
+
+
 # Growth Curve 
 
+options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
 
-Mydata <- readRDS("WWW/data/Example_Marieke")
+Mydata <- readRDS("WWW/data/RubenWide")
 output$ExampleGC_1 <- renderDT(Mydata,
-                               selection = 'none',
-                               options = list(lengthMenu = c(5, 5, 5), pageLength = 10,
-                                              lengthChange = FALSE))
+                               selection = 'none',  rownames = FALSE,
+                               options = list(lengthMenu = c(5, 5, 5), pageLength = 10,  
+                                              lengthChange = FALSE, dom = 't'), server = FALSE)
 
 
 
