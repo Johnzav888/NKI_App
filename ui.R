@@ -901,10 +901,91 @@ ui <- tagList(
                                                           fluidRow(
                                                             column(12, DTOutput("ExampleGC_1"))),
                                                           
+                                                          
+                                                          
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>"))))
+                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>","<br/>","<br/>","<br/>", 
+                                                                                  
+                                                           "In order to do a sample size calculation for this kind of experiment, we will make use of simple linear regression. More precisely, 
+                                                            we will compute the required sample size based on simple linear regression, and then we will multiply that number by a constant,
+                                                            called <i>Design Effect</i>, in order to get the required sample size for longitudinal analysis, like the one we described earlier.",
+                                                           "For that, we need first of all the minimum effect that we wish to detect, which in this case is the difference in slope of tumor growth
+                                                           between the treatment groups. Then, we need an estimate of the standard deviation of the independend variable (X's), which is the time variable
+                                                           in this experiment, as well as an estimate of the standard deviation of the response (Y's), which here is the tumor volume, after using the log-transformation on it. ",
+                                                            "Further, the power level and the significance level  \\(\\alpha\\) of a test, or in other words, the desired Type-I error,
+                                                             need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%")))),
+                                                          
+                                                          HTML("<br/>","<br/>","<br/>", "<center><i><strong><font color='blue'>Power Calculation Example</font></strong></i></center>",
+                                                               "<br/>","<br/>","<br/>"),
+                                                          
+                                                          tags$img(src = "images/PowerExample_LR1.PNG", width = "350px", height = "500px"),
+                                                          
+                                                          fluidRow(
+                                                            column(8, HTML("<br/>", "<br/>","<br/>",
+                                                               "This is an example of how this app can be used in order to perform sample size calculations. 
+                                                               The image above is from the next tab where the actual sample size calculation can be done. In this interactive panel the required input can provided,
+                                                               and the results will appear.",
+                                                             "<br/>", "<br/>","<br/>", 
+                                                               "We show the calculation of the required sample size for the previous example"))),
+                                                          
+                                                          HTML("<br/>", "<br/>","<br/>",
+                                                               "For this particular example, we have:",
+                                                               "<ol>
+                                                                   <li>Effect of interest (difference in slopes) = -0.1 (The minus sign here means that the treatment group has a less steep tumor growth)</li>
+                                                                   <li>Standard deviation of X's = 7.5 </li>
+                                                                   <li>Standard deviation of Y's = 0.716 </li>
+                                                                   <li>Average number of measurements per mouse = 10 </li>
+                                                                   </ol>",
+                                                               "<br/>", "<br/>","<br/>",
+                                                               "Finally, we specify \\(\\alpha\\) at 5% and the desired power to be 80%.")
+                                                          
+                                                          ,
+                                                          HTML("<br/>", "<br/>","<br/>",
+                                                               "If we now provide the input to the panel at the left, results will show up, as in the image below.",
+                                                               "<br/>", "<br/>","<br/>"),
+                                                          
+                                                          tags$img(src = "images/PowerExample_LR2.PNG", width = "700px", height = "300px")
+                                                          
                                                  ),
-                                                 tabPanel("Power Calculation"))), inverse = T, collapsible = T
+                                                 
+                                                 tabPanel("Power Calculation",
+                                                          sidebarLayout(
+                                                            sidebarPanel(
+                                                              numericInput( "Effect", "Interaction effect", -0.04 ),
+                                                              numericInput( "SDX", "Standard error of X", 5 ),
+                                                              numericInput( "SDY", "Standard error of Y", 0.716 ),
+                                                              numericInput( "NoMeasurements", "Average number of measurements per mouse", 8 ),
+                                                              sliderInput( "PowerInputLR", "Power", min = 0, max = 100, value = 80, step = 1),
+                                                              sliderInput( "errorInputLR", "Type I error", min = 0, max = 10, value = 5, step = 1)
+                                                              
+                                                            ),
+                                                            
+                                                            mainPanel(
+                                                              HTML("<br/>", "<br/>","<br/>", 
+                                                                   "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
+                                                              uiOutput('dynamic_valuePOWLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>% power at a </font></strong> "),
+                                                              uiOutput('dynamic_valueALLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>% significance level to detect a difference in slope between the two treatment groups of</font></strong> "),
+                                                              uiOutput('dynamic_valueEffLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> when the standard deviation of the X's is</font></strong>"),
+                                                              uiOutput('dynamic_valueSDXLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> , the standard deviation of the Y's is </font></strong>"),
+                                                              uiOutput('dynamic_valueSDYLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> , and the total number of measurements per mouse is </font></strong>"),
+                                                              uiOutput('dynamic_MeasurementsLR',inline = T),
+                                                              HTML("<br/>", "<br/>","<br/>"),
+                                                              h4("The required sample size per group is:",
+                                                                 style = "font-family: 'Lobster', cursive;
+                                                                 font-weight: 500; line-height: 1.1; 
+                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsLR'),
+                                                              
+                                                              br(), br()
+                                                              #plotOutput("Survcoolplot33")
+                                                              ))
+                                                          
+                                                          
+                                                 ))), inverse = T, collapsible = T
                            
                                                )))
   

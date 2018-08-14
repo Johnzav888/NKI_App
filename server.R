@@ -572,4 +572,59 @@ output$ExampleGC_1 <- renderDT(Mydata,
 
 
 
+# Power Calculation
+
+Power_LR <- reactive({ # Getting Rho
+  
+  power.SLR(n = 700, lambda.a = input$Effect, sigma.x = input$SDX, sigma.y = input$SDY, alpha = input$errorInputLR)
+
+})
+
+
+sample_sizeLR <- reactive({ # feeding Rho here to get the sample size (total observations)
+  
+  ss.SLR(power = input$PowerInputLR/100, lambda.a = input$Effect, sigma.x = input$SDX, sigma.y = input$SDY, 
+         alpha = input$errorInputLR/100, verbose = FALSE)$n
+  
+})
+
+# This is the total number of observations, which now we have to divide by the number of mneasurements to get the total number of mice.
+# Then, we need to multiply this amount by the Design Effect to account for the multiple measurements per mouse.
+# And finally, we need to divide that number by 2 to get the sample size per group.  
+
+# The design effect should be fixed ??? Let's fix it at 2 for now...( this means that it gets cancelled with the 2 that we divided 
+# for the groups allocation)
+
+output$resultsLR <- renderPrint({ceiling(sample_sizeLR()/(input$NoMeasurements))})
+
+output$resultsProp <- renderPrint({samsiz()})
+
+
+
+
+output$dynamic_valueEffLR <- renderPrint({
+  cat(input$Effect)})
+
+
+output$dynamic_valueSDXLR <- renderPrint({
+  cat(input$SDX)})
+
+
+output$dynamic_valueSDYLR <- renderPrint({
+  cat(input$SDY)})
+
+
+output$dynamic_MeasurementsLR <- renderPrint({
+  cat(input$NoMeasurements)})
+
+output$dynamic_valueALLR<- renderPrint({
+  cat(input$errorInputLR)})
+
+
+output$dynamic_valuePOWLR <- renderPrint({
+  cat(input$PowerInputLR)})
+
+
+
+
 } ### END
