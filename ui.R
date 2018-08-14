@@ -6,7 +6,7 @@ ipak <- function( pkg ){  # Check if the packages are installed, and if not inst
 }
 
 # usage
-packages <- c( "shiny", "ggplot2", "dplyr", "shinyjs", "shinythemes","plotly","samplesize","fBasics", "DT", "survival")
+packages <- c( "shiny", "ggplot2", "dplyr", "shinyjs", "shinythemes","plotly","samplesize","fBasics", "DT", "survival", "powerMediation")
 ipak( packages )
 
 
@@ -909,8 +909,8 @@ ui <- tagList(
                                                            "In order to do a sample size calculation for this kind of experiment, we will make use of simple linear regression. More precisely, 
                                                             we will compute the required sample size based on simple linear regression, and then we will multiply that number by a constant,
                                                             called <i>Design Effect</i>, in order to get the required sample size for longitudinal analysis, like the one we described earlier.",
-                                                           "For that, we need first of all the minimum effect that we wish to detect, which in this case is the difference in slope of tumor growth
-                                                           between the treatment groups. Then, we need an estimate of the standard deviation of the independend variable (X's), which is the time variable
+                                                           " For that, we need first of all the minimum effect that we wish to detect, which in this case is the difference in slope of tumor growth
+                                                           between the treatment groups. Then, we need an estimate of the standard deviation of the independent variable (X's), which is the time variable
                                                            in this experiment, as well as an estimate of the standard deviation of the response (Y's), which here is the tumor volume, after using the log-transformation on it. ",
                                                             "Further, the power level and the significance level  \\(\\alpha\\) of a test, or in other words, the desired Type-I error,
                                                              need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%")))),
@@ -944,7 +944,8 @@ ui <- tagList(
                                                                "If we now provide the input to the panel at the left, results will show up, as in the image below.",
                                                                "<br/>", "<br/>","<br/>"),
                                                           
-                                                          tags$img(src = "images/PowerExample_LR2.PNG", width = "700px", height = "300px")
+                                                          tags$img(src = "images/PowerExample_LR2.PNG", width = "700px", height = "300px"),
+                                                          HTML("<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>")
                                                           
                                                  ),
                                                  
