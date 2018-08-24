@@ -348,7 +348,7 @@ sample_sizeSurv2 <- reactive({
 }) 
 
 
-output$resultsSurv1 <- renderPrint({sample_sizeSurv2()})
+output$resultsSurv1 <- renderPrint({ceiling(sample_sizeSurv2())})
 
 
 
@@ -571,33 +571,62 @@ output$ExampleGC_1 <- renderDT(Mydata,
                                               lengthChange = FALSE, dom = 't'), server = FALSE)
 
 
+Mydata2 <- readRDS("WWW/data/RubenLong")
+
+Mydata2 <- Mydata2 %>% mutate_if(is.numeric, round, 3)
+
+output$ExampleGC_2 <- renderDT(Mydata2,
+                               selection = 'none',  rownames = FALSE,
+                               options = list(lengthMenu = c(5, 5, 5), pageLength = 10,  
+                                              lengthChange = FALSE, dom = 't'), server = FALSE)
 
 # Power Calculation
 
-Power_LR <- reactive({ # Getting Rho
+
+SDX <- reactive({sd(seq(0, input$NoMeasurements, by = input$Space))})
+
+
+sample_sizeLR <- reactive({
   
-  power.SLR(n = 700, lambda.a = input$Effect, sigma.x = input$SDX, sigma.y = input$SDY, alpha = input$errorInputLR)
-
-})
-
-
-sample_sizeLR <- reactive({ # feeding Rho here to get the sample size (total observations)
-  
-  ss.SLR(power = input$PowerInputLR/100, lambda.a = input$Effect, sigma.x = input$SDX, sigma.y = input$SDY, 
-         alpha = input$errorInputLR/100, verbose = FALSE)$n
+  Sigma <- (input$VARres) * (1/(SDX()^2) + 1/(SDX()^2))
+  SS <- ((qnorm((input$errorInputLR/100)/2, lower.tail = F) + qnorm((input$PowerInputLR/100)))^2 * Sigma)/((input$Effect)^2)
   
 })
+
+
+
+#Power_LR <- reactive({ # Getting Rho
+  
+  
+#  power.SLR(n = 700, lambda.a = input$Effect, sigma.x = SDX, sigma.y = SDX, alpha = input$errorInputLR)
+  
+#})
+
+
+#sample_sizeLR1 <- reactive({ # feeding Rho here to get the sample size (total observations)
+  
+#  ss.SLR(power = input$PowerInputLR/100, lambda.a = input$Effect, sigma.x = input$SDX, sigma.y = input$SDY, 
+#         alpha = input$errorInputLR/100, verbose = FALSE)$n
+  
+#})
+
+
 
 # This is the total number of observations, which now we have to divide by the number of mneasurements to get the total number of mice.
 # Then, we need to multiply this amount by the Design Effect to account for the multiple measurements per mouse.
-# And finally, we need to divide that number by 2 to get the sample size per group.  
 
-# The design effect should be fixed ??? Let's fix it at 2 for now...( this means that it gets cancelled with the 2 that we divided 
-# for the groups allocation)
+# The design effect should be fixed ??? Let's fix it at 2 for now...
 
-output$resultsLR <- renderPrint({ceiling(sample_sizeLR()/(input$NoMeasurements))})
 
-output$resultsProp <- renderPrint({samsiz()})
+DE <- reactive({
+  (input$SE_AR^2)/(input$SE_LR^2)
+})
+
+
+output$resultsLR <- renderPrint({ceiling(DE()*sample_sizeLR()/(input$NoMeasurements))})
+
+
+#output$resultsProp <- renderPrint({samsiz()})
 
 
 
@@ -606,16 +635,22 @@ output$dynamic_valueEffLR <- renderPrint({
   cat(input$Effect)})
 
 
-output$dynamic_valueSDXLR <- renderPrint({
-  cat(input$SDX)})
+output$dynamic_valueSDX1LR <- renderPrint({
+  cat(input$SDX1)})
 
+output$dynamic_valueSDX2LR <- renderPrint({
+  cat(input$SDX2)})
 
-output$dynamic_valueSDYLR <- renderPrint({
-  cat(input$SDY)})
+output$dynamic_valueVARresLR <- renderPrint({
+  cat(input$VARres)})
 
 
 output$dynamic_MeasurementsLR <- renderPrint({
   cat(input$NoMeasurements)})
+
+
+output$dynamic_DistaLR <- renderPrint({
+  cat(input$Space)})
 
 output$dynamic_valueALLR<- renderPrint({
   cat(input$errorInputLR)})
