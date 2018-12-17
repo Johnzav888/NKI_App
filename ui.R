@@ -2,11 +2,14 @@ ipak <- function( pkg ){  # Check if the packages are installed, and if not inst
   new.pkg <- pkg[!( pkg %in% installed.packages()[, "Package"] ) ]
   if ( length( new.pkg ) ) 
     install.packages(new.pkg, dependencies = TRUE )
-  sapply( pkg, require, character.only = TRUE )
+  for(package_name in pkg)
+  {library(package_name,character.only=TRUE, quietly = TRUE)}
+
 }
 
 # usage
-packages <- c( "shiny", "ggplot2", "dplyr", "shinyjs", "shinycssloaders", "shinythemes", "plotly","samplesize","fBasics", "DT", "survival", "powerMediation")
+#packages <- c("xlsx", "nlme", "shiny", "ggplot2", "dplyr", "shinyjs", "shinycssloaders", "shinythemes", "plotly", 
+#               "samplesize","fBasics", "DT", "survival", "powerMediation", "stringi", "stringr", "statmod")
 #ipak(packages)
 
 
@@ -22,6 +25,10 @@ library(fBasics)
 library(survival)
 library(crayon)
 library(shinycssloaders)
+library(stringr)
+library(xlsx)
+library(nlme)
+library(statmod)
 
 #library(shiny.router)
 
@@ -45,75 +52,98 @@ ui <- tagList(
                            , fluid = FALSE, windowTitle = "NKI_statistics", 
                            tabPanel("Design and statistical analysis of mice experiments", value = "StartPage",
                                     
-                                    HTML(paste0("<br/>", "<br/>","<br/>",
-                                                    "<center>This app supports researchers conducting mice experiments in the Netherlands Cancer Institute in the statistical aspects of the studies.
-                                                      It provides explanations of basic statistical concepts and tests. Moreover, researchers can use this app to calculate sample size and power
-                                                    when an experiment is being designed. The latter is vital and must be performed, because:</center>",
-                                                    "<br/>", "<br/>","<br/>",
+                                    fluidRow(
+                                      column(8, HTML(paste0("<br/>",
+                                                    "This website supports researchers conducting mice experiments at the Netherlands Cancer Institute
+                                                    in the statistical aspects of the studies. It provides explanations of basic statistical concepts and tests.
+                                                    Moreover, researchers can use this app to calculate the required sample size when an experiment is being designed.
+                                                    The latter is vital and must be performed, because :",
+                                                    "<br/>", "<br/>",
                                                     "<i><center><strong> More power increases the confidence in the results, whether they are significant or not </strong></center></i>",
-                                                    "<br/>", "<br/>","<br/>",
-                                                    "Details about sample size calculations can be found in the  ")),
+                                                    "<br/>", "<br/>",
+                                                    "Some background about sample size calculations can be found in the  ")),
                                                
                                                #tags$div(
                                               #        id = "sdf",
                                                #       tags$a(onclick = "customHref('Power')", "Power")),
                                                #tags$div(
                                                  #id = "Others",
-                                                 tags$a("Statistical Power section", onclick = "customHref('Page2');customHref('tab1');")
+                                                 tags$a("Statistical Power", onclick = "customHref('Page2');customHref('tab1');"),
                                                  #tags$a("ff2", onclick = "customHref('Others');")
-                                              
+                                              HTML("section")))
                                       ,
                                       
                                     fluidRow(
-                                      column(8, HTML(paste0("<br/>", "<br/>","<br/>",
-                                      "Sample size calculation depends on the type of experiment. The most common experimental designs used for mice experiments at the NKI compare groups of mice with respect to mean/median values, survival outcomes,
-                                      proportions and tumor growth. Examples of such experiments are listed below and more information can be found under the specific tabs.")))),
+                                      column(8, HTML(paste0("<br/>", "<br/>",
+                                      "Sample size calculation depends on the type of experiment. In  most of the mouse experiments conducted in the Netherlands Cancer Institute,  
+                                      groups of mice are compared with respect to mean/median values, survival outcomes, proportions and tumor growth. 
+                                      Examples of such experiments are listed below and more information can be found under the specific tabs.")))),
                           
                                     fluidRow(
-                                      column(8, HTML(paste0("<br/>", "<br/>","<br/>",
-                                      "<i><strong><font color='red'> Comparison of mean/medians</font></strong></i>",
-                                      "<br/>", "<br/>","<br/>",
-                                      "<i>Example:</i> : A scientist wants to test the hypothesis that a novel compound reduces high-density lipoprotein (HDL) cholesterol levels 
-                                        in a transgenic C57Bl/6J strain of mice compared with standard treatment. Therefore she randomizes half of the mice to the standard treatment and the other half to the new treatment, in order to compare average HDL cholesterol levels between the two groups",
-                                      "<br/>", "<br/>","<br/>")))),
+                                      column(8, HTML(paste0("<br/>", "<br/>",
+                                      "<i><strong><font color='red'> Comparison of means/medians</font></strong></i>",
+                                      "<br/>", "<br/>",
+                                      "<i>Example:</i> : A scientist wants to test the hypothesis that a novel compound is superior in reducing high-density lipoprotein (HDL)
+                                          cholesterol levels in a transgenic C57Bl/6J strain of mice in comparison  to a standard treatment. In the experiment, one group of  mice
+                                          receives the standard treatment and the other group receives the novel compound. At the end of the experiment, the HDL cholesterol levels are
+                                          determined in all mice and the average HDL cholesterol level between both groups is compared.",
+                                          "<br/>", "<br/>")))),
                           
-                          tags$a("Go to Mean/Median Analysis", onclick = "customHref('Page4');"),
+                          tags$a("Go to Means/Median Analysis", onclick = "customHref('Page4');"),
                           
                           
                           fluidRow(
-                            column(8, HTML(paste0("<br/>", "<br/>","<br/>",
+                            column(8, HTML(paste0("<br/>", "<br/>",
                                "<i><strong><font color='red'> Survival Analysis </font></strong></i>",
-                               "<br/>", "<br/>","<br/>",
-                               "<i>Example:</i> To evaluate whether treatment with paclitaxel improves survival after esophageal adenocarcinoma (EAC), a scientist uses a peritoneal dissemination xenograft mouse model and injects human EAC cell lines intraperitoneally/subcutaneously into SCID mice.
-                                Two weeks later, mice are randomly assigned to treatment by vehicle or paclitaxel (20mg/kg, 2 times a week for 2 weeks). Mice are followed until death or the end of the study and  the mouse survival times are compared between the 2 groups.",
-                               "<br/>", "<br/>","<br/>")))),
+                               "<br/>", "<br/>",
+                               "<i>Example:</i> To evaluate whether the chemotherapeutic agent  paclitaxel improves survival after esophageal adenocarcinoma (EAC), 
+                                a scientist uses a peritoneal dissemination xenograft mouse model and injects human EAC cell lines intraperitoneally into severe combined immunodeficiency (SCID) mice. 
+                                Two weeks later, the mice are randomly assigned to either  vehicle or paclitaxel (20mg/kg, 2 times a week for 2 weeks) groups. 
+                                Mice are followed until death or the end of the study duration to compare the survival distributions  between the two  groups.",
+                               "<br/>", "<br/>")))),
                
                        tags$a("Go to Survival Analysis", onclick = "customHref('Page5');"),
                     
                        fluidRow(
-                         column(8, HTML(paste0("<br/>", "<br/>","<br/>",
+                         column(8, HTML(paste0("<br/>", "<br/>",
                             "<i><strong><font color='red'> Proportion Analysis</font></strong></i>",
                             "<br/>", "<br/>","<br/>",
-                            "<i>Example:</i> A scientist wants to test the hypothesis that a new combination treatment is able to completely regress tumor more efficiently compared with a control.
-                             As complete responders are considered those mice
-                            that do not have palpable tumors for 14 days. The proportions of complete responders are compared between treatment groups.",
-                            "<br/>", "<br/>","<br/>")))),
+                            "<i>Example:</i> A scientist wants to test the hypothesis that a new combination treatment is associated with a higher proportion of mice having
+                              a complete response  compared with  a  standard treatment.  Mice without palpable tumors for 14 days are considered complete responders. 
+                              The proportions of complete responders are compared between treatment groups.",
+                            "<br/>", "<br/>")))),
                
                       tags$a("Go to Proportion Analysis", onclick = "customHref('Page6');"),
     
                       fluidRow(
-                        column(8, HTML(paste0("<br/>", "<br/>","<br/>",
+                        column(8, HTML(paste0("<br/>", "<br/>",
                             "<i><strong><font color='red'> Growth Curve Analysis</font></strong></i>",
-                          "<br/>", "<br/>","<br/>",
-                          "<i>Example:</i> A scientist wants to test the hypothesis that a new treatment is able to suppress the tumor growth
-                           compared with standard treatment. To assess that she conducts an experiment, where tumor cells are injected into mice and the volume of the growing tumor is measured every 2-3 days until 
-                          the mouse dies or is sacrificed. When tumors reach a pre-defined volume, she randomizes half of the mice to the standard treatment and the other half to the new treatment,
-                          in order to compare the rate of tumor growth between groups.",
-                          "<br/>", "<br/>","<br/>")))),
+                          "<br/>", "<br/>",
+                          "<i>Example:</i> A scientist wants to test the hypothesis that a new treatment is able to slow down tumor growth.
+                            An experiment is conducted where tumor cells are injected into mice and volume of the  tumor is measured every 2-3 days.
+                            When tumors reach a pre-defined volume of 1500 mm3,  mice are randomized to receive either the standard treatment or the new treatment.
+                            Tumor volume is measured until mice die or are sacrificed. The rate of tumor growth is compared between treatment groups.",
+                          "<br/>", "<br/>")))),
   
                       tags$a("Go to Growth Curve Analysis", onclick = "customHref('Page7');"),
   
-                      HTML(paste0("<br/>", "<br/>","<br/>"))),
+                      HTML(paste0("<br/>", "<br/>","<br/>")),
+                      tags$footer(HTML(paste0("Please note that this is the first version of the website.",
+                                              "<br/>", "<br/>",
+                                              "Should you encounter any bugs, glitches, lack of functionality or other problems on the website,
+                          please let us know immediately so we can rectify these accordingly. Your help in this regard is greatly appreciated!
+                          You can send your comments to j.zavrakidis@nki.nl",
+                                              "<br/>", "<br/>","<br/>","<br/>","<br/>")),
+                                  style = "text-align:center;
+                              margin-left:150px;
+                              bottom:0;
+                              width:50%;
+                              height:120px;   /* Height of the footer */
+                              color: red;
+                              background-color:lightblue;
+                              background-size: 100% 100%;
+                              ")
+                      ),
               
        tabPanel("Statistical Power", value = "Page2",
                                     withMathJax(),
@@ -137,11 +167,15 @@ ui <- tagList(
                                                       })</script>"),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                            "An experiment is conducted to answer a particular research question, for instance, to investigate whether the outcome after a new treatment differs from the outcome after the standard treatment,
-                                                            i.e. whether there is an effect of the new treatment. The results of a statistical hypothesis test are supposed to reflect the true state of nature, but they may not always do so.
+                                                   column(8, HTML(paste0("<br/>","<br/>",
+                                                            "An experiment is conducted to answer a particular research question, for instance, 
+                                                            to investigate whether the outcome after a new treatment differs from the outcome after the standard treatment,
+                                                            i.e. whether there is an effect of the new treatment. The research question is typically framed into a null hypothesis
+                                                            (e.g., there is no treatment effect) and an alternative hypothesis (e.g., there is a treatment effect). The answer to the
+                                                            research question is based on a statistical hypothesis test, which either leads to the rejection of the null hypothesis or not. 
+                                                            The statistical test is designed to generally reflect the true state of nature, but there is a chance for erroneous decisions. 
                                                             A researcher can make two types of correct decisions and two types of errors, which is shown in the table below.",
-                                                            "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>")))),
+                                                            "<br/>","<br/>","<br/>")))),
                                                 
                                                  tags$img(src = "images/HypothesisTest_table.PNG", width = "800px", height = "300px"),
                                                  
@@ -149,40 +183,44 @@ ui <- tagList(
                                                  fluidRow(
                                                    column(8, HTML(paste0(
                                                    "<br/>","<br/>","<br/>",
-                                                   "The effect either exists or not in nature, while the result of the statistical analysis is either significant or non-significant. 
-                                                   Therefore, based on the statistical analysis, a researcher either makes a correct inference about the effect or a false one.  
-                                                   The type I error, which is denoted by the Greek letter \\(\\alpha\\) , is the probability of finding an effect when it does not exist in nature \\(\\alpha\\) is also called the significance level of a test
-                                                   and the Type II error, denoted by the Greek letter \\(\\beta\\) , is the probability of not finding an effect when the effect exists in nature.  
-                                                   So, the Type I error is the probability of a false positive finding, while the Type II error is the probability of a false negative finding.
-                                                   Complements of the two probabilities, 1-\\(\\alpha\\)  and 1-\\(\\beta\\) , are probabilities of correctly not finding an effect (true negative finding) and correctly finding an effect (true positive finding),
-                                                   respectively. The latter probability, 1-\\(\\beta\\) is called the statistical power of a test. The value of alpha is  usually fixed at 0.05. The value of beta decreases with increasing effect size
-                                                   and sample size.")))),
+                                                   "The effect either exists or not in nature, while the result of the statistical analysis is either significant or non-significant. Therefore, based on the statistical analysis, 
+                                                   a researcher either makes a correct inference about the effect or a false one.  The type 1 error (\\(\\alpha\\)) is the probability of finding an 
+                                                   effect, i.e. rejecting the null hypothesis of no effect, when it does not exist. It is also called the significance level of a test. The type 2 error (\\(\\beta\\)) is the probability of not finding
+                                                   an effect, i.e., not rejecting the null hypothesis of no effect, when the effect exists. The type 1 error is the probability of a false positive finding, while the type 2 error is the probability 
+                                                   of a false negative finding. Complements of the two probabilities, 1-\\(\\alpha\\)  and 1-\\(\\beta\\) , are probabilities of correctly not finding an effect
+                                                   (true negative finding) and correctly finding an effect (true positive finding), respectively. The latter probability, 1- \\(\\beta\\), is also called 
+                                                   the statistical power of a test. The value of \\(\\alpha\\) is usually fixed at 0.05. The value of beta decreases with increasing effect size and sample size.
+                                                   ")))),
+                                                 
+                                                 
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                  "If there is a true effect of a treatment, researchers would like to detect it with high probability. A power level of 0.8 or 0.9 is usually considered sufficient. 
-                                                   For illustration, if 100 experiments are conducted with an existing true effect and each experiment has a power of 0.8 or 80%, the statistical analyses would be significant for 80 experiments
-                                                   (and result in rejection of the hypothesis of no effect), while 20 experiments would result in a non-significant result of the statistical test, i.e., the true effect would be missed.
-                                                   On the other hand, if none of the 100 experiments is based on a true effect, and a significance level of alpha=0.05 or 5% is used, then the statistical analysis of 5 experiments would be 
-                                                   expected to be statistically significant (p<0.05), i.e., reflecting false positive (or chance) findings.",
+                                                   column(8, HTML(paste0("<br/>","<br/>",
+                                                  "If there is a true effect of a treatment, researchers would like to detect it with high probability.
+                                                   A power level of 0.8 or 0.9 is usually considered sufficient. For illustration, if 100 experiments are conducted with an existing true effect and
+                                                  each experiment has a power of 0.8 (i.e., 80%), the statistical analyses would be significant for 80 experiments (and result in rejection of the
+                                                  hypothesis of no effect), while 20 experiments would yield a non-significant result of the statistical test, i.e., the true effect would be missed 
+                                                  (false negative finding). On the other hand, if none of the 100 experiments is based on a true effect, and a significance level of \\(\\alpha\\)=0.05 (i.e., 5%) 
+                                                  is used, then the statistical analysis of 5 experiments would be expected to be statistically significant (p<0.05), i.e., reflecting false positive 
+                                                  (or chance) findings.",
                                                    "<br/>","<br/>","<br/>",
-                                                   "Statistical power is a measure of confidence to detect an effect (i.e. significant result) if it truly exists.
-                                                   The power depends on the sample size of an experiment and the magnitude of the effect. During the design phase of an experiment,
-                                                   a researcher can assess how many mice need to be included in order to detect a true effect with sufficient probability. 
-                                                   This assessment is important because an underpowered experiment (too few mice) can miss an effect that truly exists. 
-                                                   An overpowered experiment (too many mice) can detect an effect that truly exists but is so small that is of practical relevance.
-                                                   In both situations, resources spent on an experiment, such as money, time or mice's lives, are wasted",
+                                                   "Statistical power is a measure of confidence to detect an effect (i.e., a significant result) if it truly exists. The power depends on the sample size of 
+                                                  an experiment and the magnitude of the effect. During the design phase of an experiment, a researcher can assess how many mice need to be included in
+                                                  order to detect a true effect with sufficient probability. This assessment is important because an underpowered experiment (too few mice) can miss an
+                                                  effect that truly exists. An overpowered experiment (too many mice) can detect an effect that truly exists but is so small that it is not of practical
+                                                  relevance. In both situations, resources spent on an experiment, such as money, time or animals' lives are wasted.",
                                                    
-                                                   "<br/>","<br/>", "<br/>", "<br/>",
-                                                   "* More Power increases chances of finding significant result.",
+                                                   "<br/>","<br/>", 
+                                                   "* More power increases the chance of a significant result.",
                                                    "<br/>",
-                                                   "* More Power increases chances of replicating prior findings",
+                                                   "* More power increases the chance of replicating prior findings, if true.",
                                                    "<br/>",
-                                                   "* More Power increases confidence about results, either significant or not",
+                                                   "* More power increases the confidence about the results, either significant or not.",
                                                    "<br/>",
-                                                   "<br/>", "<br/>", "<br/>",
+                                                   "<br/>", 
                                                    
                                                    "So far, we assumed that a true effect does or does not exist. In reality, this is unknown. Let R be the probability that a true effect exists for a particular experiment or, 
-                                                   in a large number of experiments (e.g., all experiments in a career), the proportion of experiments with a true effect. The table of decisions is then given by:  ",
+                                                    in a large number of experiments (e.g., all experiments done in a career), the proportion of experiments with a true effect.
+                                                    The table of possible decisions based on statistical tests is then given by:    ",
                                                    "<br/>","<br/>","<br/>"
                                                    )))),
                                                  
@@ -190,24 +228,26 @@ ui <- tagList(
                                                  
                                                  fluidRow(
                                                    column(8, HTML(paste0(
-                                                   "<br/>","<br/>","<br/>",
-                                                   "Assume a scientist selects experiments so that a true effect exists for half of his experiments.
-                                                   If he chooses the sample sizes so that power is 80%, he is expected to obtain significant tests for 40 of the 50 experiments with a true effect 
-                                                   and miss the effect for the remaining 10 experiments. If power is 50%, only 25 of the 50 true effects will, on average, be identified. 
-                                                   For each mice experiment, four important measures are considered:"
+                                                   "<br/>","<br/>",
+                                                   "Assume a scientist develops and tests hypotheses so that a true effect exists (i.e., the null hypothesis is wrong) for half of her experiments (R=0.5).
+                                                   If she chooses the sample sizes of 100 experiments so that power is 80%, she is expected to obtain significant tests for 40 of the 50 experiments with a true effect
+                                                   (i.e., reject 40 of the 50 wrong null hypotheses) and miss the effect for the remaining 10 experiments (i.e., not reject 10 of the 50 wrong null 
+                                                   hypotheses). If power is 50%, only 25 of the 50 true effects will, on average, be identified. For each experiment, four important measures are considered:"
                                                  )))),
+                                                 
+                                                 
                                                  fluidRow(
                                                    column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                             h4("For each mice experiment, four important measures are considered:"),
-                                                             "<br/>", "<br/>","<br/>",
+                                                             
                                                              "1.$$\\text{True positive rate} = \\frac{Power*R}{Power*R + (1-Power)*R} = Power$$",
-                                                             "It is the probability of a significant result if the effect truly exists in nature",
+                                                             "The probability of a significant result if the effect truly exists.",
                                                              "<br/>","<br/>","<br/>",
-                                                             "2.$$\\text{True negative rate} =  \\frac{(1-\\alpha)*(1-R)}{(1-\\alpha)*(1-R) + \\alpha*(1-R)} = (1-\\alpha)$$",
-                                                             "It is the probability of a non-significant result if the effect does not exist in nature. It is the complement of type-I error  \\(\\alpha\\)",
+                                                             "2.$$\\text{True negative rate} =  \\frac{(1-\\alpha)*(1-R)}{(1-\\alpha)*(1-R) + \\alpha*(1-R)} = 1-\\alpha$$",
+                                                             "The probability of a non-significant result if the effect does not exist. It is the complement of the type 1 error \\(\\alpha\\).",
                                                              "<br/>","<br/>","<br/>",
-                                                             "3.$$\\text{Positive Predictive Value(PPV)} = \\frac{Power*R}{Power*R + \\alpha*(1-R)}$$",
-                                                             "It is the probability that the effect exists in nature given a significant result of the statistical test. As can be seen from the formula and the graph below, that probability increases with increasing power and R.",
+                                                             "3.$$\\text{Positive predictive value(PPV)} = \\frac{Power*R}{Power*R + \\alpha*(1-R)}$$",
+                                                             "The probability that the effect exists given a significant result of the statistical test.
+                                                             As can be seen from the formula and the graph below, this probability increases with increasing power and R.",
                                                              "<br/>","<br/>","<br/>")))),
                                                  
                                                              tags$img(src = "images/PPV_0.05.png", width = "800px", height = "500px"),
@@ -215,7 +255,8 @@ ui <- tagList(
                                                  fluidRow(
                                                    column(8, HTML(paste0("<br/>","<br/>","<br/>",
                                                              "4.$$\\text{False Positive Report Probability(FPRP)} = 1-PPV = \\frac{\\alpha*(1-R)}{Power*R + \\alpha*(1-R)}$$",
-                                                             "It is the probability that there is no effect in nature if the statistical test is significant. As can be seen from the formula and the graph below, this probability decreases with increasing power and R.",
+                                                             "The probability that there is no effect if the statistical test is significant.
+                                                             As can be seen from the formula and the graph below, this probability decreases with increasing power and R.",
                                                             
                                                              "<br/>", "<br/>", "<br/>"
                                                  )))),
@@ -225,12 +266,13 @@ ui <- tagList(
                                                  
                                                  fluidRow(
                                                    column(8, HTML(paste0("<br/>", "<br/>", "<br/>",
-                                                             "Combining type 1 and type 2 errors, the false conclusion rate can be determined. As is illustrated in the graph below, this rate decreases with increasing power and decreasing R.
-                                                             Moreover, when the prior probability of the effect existence is maximum, i.e. R=1, then the false conclusion rate depends only on the power level of the test and more precisely, 
-                                                              it is actually equal to the Type II error rate \\(\\beta\\) or equivalently to 1-power. On the contrary situation, i.e. when R = 0, the false conclusion rate is equal to the Type I error rate \\(\\alpha\\).
-                                                              As the power and R increase, this rate approaches zero. For fixed value of \\(\\alpha\\) and power, higher probability R is associated with more false experimental results and the lower the power the higher the influence of R on the false conclusion rate.",
-                                                             "<br/>", "<br/>", "<br/>",
-                                                             "For fixed value of \\(\\alpha\\) and power, higher probability R is associated with more false experimental results and the lower the power the higher the influence of R on the false conclusion rate.",  
+                                                             "A false conclusion is either making a type 1 or type 2 error. The false conclusion rate can be determined by combining the type 1 and type 2 errors.
+                                                              As is illustrated in the graph below, this rate decreases with increasing power and decreasing R.
+                                                              Moreover, when the prior probability of the effect is maximum, i.e., R=1, then the false conclusion rate depends only on the power of the test. 
+                                                              More precisely, it is actually equal to the type 2 error \\(\\beta\\) or equivalently to 1-power. When R = 0, the false conclusion rate is equal to the 
+                                                              type 1 error \\(\\alpha\\) .
+                                                              For fixed values of \\(\\alpha\\) and power, a higher probability R is associated with more false conclusions. The lower the power, 
+                                                              the higher the influence of R on the false conclusion rate.",
                                                             "<br/>", "<br/>", "<br/>")))),
                                                  
                                                  
@@ -261,101 +303,115 @@ ui <- tagList(
                                                       })</script>"),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>", "<br/>",
+                                                   column(8, HTML(paste0("<br/>", "<br/>", 
                                                              "<i><strong><font color='red'>Statistical power depends on three factors</font></strong></i>",
                                                              "<br/>","<br/>","<br/>",
-                                                             "To determine the power of an analysis we need firstly to specify the alternative Hypothesis, Ha, or in other words,
-                                                             the effect size that we are interesting in detecting. Further, and for most of analyses, power is proportional to the following:",
+                                                             "To determine the power of an analysis we need firstly to specify the alternative hypothesis, \\(H_a\\), or in other words,
+                                                             the effect size that we are interested in detecting. Further, and for most of analyses, power is proportional to the following:",
                                                              "<br/>", "<br/>",
                                                              
-                                                             "*<i><strong><font color='red'>Effect size</font></strong></i> : an estimate of the size of the effect which can be measured as a difference in mean/median values, survival outcomes, proportions 
-                                                             or growth rates; the bigger the effect size the higher the power",
+                                                             "*<i><strong><font color='red'>Effect size</font></strong></i> : the size of the effect, which can be measured as a difference in mean/median values, survival outcomes, 
+                                                                          proportions or growth rates; the bigger the effect size the higher the power",
                                                              "<br/>","<br/>", "<br/>", 
                                                              "*<i><strong><font color='red'>Sample size</font></strong></i> : the number of mice included in an experiment; the higher the number of mice the higher the power.",
                                                              "<br/>","<br/>", "<br/>", 
-                                                             "*<i><strong><font color='red'>Significance level(\\(\\alpha\\))</font></strong></i> : the type-I error of a test; the higher the \\(\\alpha\\) the higher the power, but \\(\\alpha\\) is almost always fixed at 0.05.",
+                                                             "*<i><strong><font color='red'>Significance level(\\(\\alpha\\))</font></strong></i> : the  type 1 error of a test; the higher the \\(\\alpha\\) the higher the power, but \\(\\alpha\\) is almost always fixed at 0.05.",
                                                              "<br/>","<br/>", "<br/>",
                                                              
-                                                             "The power level can be assessed when the three factors are known or the required sample size needed for an experiment can be calculated when the power level and the two other factors are fixed.
-                                                             Sample size can be calculated for any study design and statistical test. The results are only valid for an experiment using the specific design and statistical test.",
-                                                             "<br/>", "<br/>", "<br/>", "<br/>", "<br/>")))),
+                                                             "Power can be calculated based on the three factors. More often, the required sample size is calculated as a function of power, 
+                                                             \\(\\alpha\\) and an estimate of the effect size. Sample size can be calculated for any study design and statistical test.",
+                                                             "<br/>", "<br/>")))),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                   column(8, HTML(paste0("<br/>","<br/>",
                                                              "<i>The correct sample size can be obtained through the following steps:</i>",
                                                              "<br/>","<br/>","<br/>",
-                                                             "1. Formulating the research question, i.e. defining clearly what the hypothesis of interest is.",
+                                                             "1. Formulate the research question, i.e., define clearly what the null hypothesis and the alternative
+                                                              hypothesis of interest are",
+                                                             "<br/>","<br/>",
+                                                             "2. Identify the statistical test to be performed on the data from the experiment",
+                                                             "<br/>","<br/>",
+                                                             "3. Determine  a reasonable value for the expected effect size based on substantive knowledge, literature, previous experiments, or select the smallest effect size that is considered as clinically important",
+                                                             "<br/>","<br/>",
+                                                             "4. Select the desired \\(\\alpha\\) level (almost always 0.05)",
+                                                             "<br/>","<br/>",
+                                                             "5. Select the desired power level (mostly 0.8 or 0.9) and calculate the required sample size ",
                                                              "<br/>","<br/>","<br/>",
-                                                             "2. Identifying the statistical test to be performed on the data from the experiment.",
-                                                             "<br/>","<br/>","<br/>",
-                                                             "3. Determining a reasonable value for the expected effect size based on substantive knowledge, literature, or previous experiments, or selecting the smallest effect size that is considered as clinically important.",
-                                                             "<br/>","<br/>","<br/>",
-                                                             "4. Selecting the desired \\(\\alpha\\) level",
-                                                             "<br/>","<br/>","<br/>",
-                                                             "5. Selecting the desired power level and calculating the required sample size.",
-                                                             "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>"
+                                                             "Other tabs and links to external sources on this website allow you to calculate the sample size needed in
+                                                             different situations.",
+                                                             "<br/>","<br/>","<br/>","<br/>"
                                                  ))))
                                                  
                                                  ),
-                                        tabPanel("Other Statistical issues",
+                                        tabPanel("Other Statistical issues", value = "tab3",
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                             "<i><center><strong><font color='red'>Multiple Comparisons</font></strong></i></center>",
-                                                             "<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                             "When an experiment involves more than 1 comparison, the overall probability of Type I error in the experiment is higher than the selected \\(\\alpha\\) level of one test. This overall probability is also called the familywise error rate or experiment-wise error rate
-                                                              and is the probability that at least one comparison leads to a false positive finding. It is calculated with the formula: $$1-(1-\\alpha)^{n}$$
-                                                              where \\(\\alpha\\) is the significance level for an individual comparison and n is the total number of comparisons in the experiment. For instance an experiment with 4 groups involves 6 pairwise comparisons. 
-                                                              The probability that at least one comparison leads to a false-positive conclusion is equal to  
-                                                              $$1-(.95)^{6}=26\\%$$",
+                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>",
+                                                             "<i><strong><font color='red'>Multiple Comparisons</font></strong></i>",
                                                              "<br/>", "<br/>", "<br/>",
+                                                             "When an experiment involves more than one comparison, i.e., more than one null hypothesis and
+                                                              therefore more than one statistical test, the overall conclusion is that a subset of null hypotheses is rejected. 
+                                                              For each test, the probability of a type 1 error is \\(\\alpha\\), but for all tests combined, the probability of a type 1 error is higher. 
+                                                              This overall probability is also called the family-wise error rate or experiment-wise error rate. It is the probability that at 
+                                                              least one comparison leads to a false positive finding and is calculated as:  
+                                                              $$1-(1 - a)^{m}$$",
+                                                             "<br/>",
                                                              
-                                                             "Many statistical techniques have been developed in order to deal with this issue, i.e. to control the familywise error rate. The most common approach is the Bonferroni correction:
-                                                            the overall desired familywise error rate is divided by the number of comparisons in the experiment to find the individual \\(\\alpha\\) level to be used for each comparison. 
-                                                             So, if a researcher wants to conduct 10 statistical tests with the familywise error rate at 0.05, then the significance level for each individual test should be 0.05/10=0.005,
-                                                             which means that only those comparisons with P < 0.005 are considered significant",
-                                                              "<br/>", "<br/>", "<br/>", 
-                                                             "The control of the familywise error rate needs to be taken into account not only in the data analysis phase of an experiment but also when sample size calculations are performed.",
-                                                             "<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>")))),
+                                                             "where \\(\\alpha\\) is the significance level for an individual comparison and m is the total number of comparisons in the experiment.
+                                                             For instance, an experiment with 4 groups involves 6 pairwise comparisons. The probability that at least one comparison leads 
+                                                             to a false-positive conclusion is equal to ,
+                                                             
+                                                             $$1-(1 - 0.05)^{6} = .265$$",
+
+                                                              "<br/>", 
+                                                             
+                                                             "Many statistical techniques have been developed in order to deal with this issue, i.e., to control the family-wise error rate.
+                                                             The most common approach is the Bonferroni correction: the overall desired family-wise error rate (e.g., 0.05) is divided by the number
+                                                             of comparisons m in the experiment to find the individual \\(\\alpha\\) level to be used for each comparison. So, if a researcher wants to conduct m=10
+                                                             statistical tests with a family-wise error rate of 0.05, the significance level for each individual test should be 0.05/10=0.005. 
+                                                             This means that only those comparisons with P < 0.005 are considered significant and the probability that even one of the rejected hypotheses is a
+                                                             false-positive is less than 0.05.",
+                                                             
+                                                             "The control of the family-wise error needs to be taken into account not only in the data analysis phase of an experiment but also when sample size calculations are performed.",
+                                                             "<br/>", "<br/>", "<br/>")),
                                                  
-                                                 tags$img(src = "images/FWER.PNG", width = "800px", height = "500px"),
+                                                 tags$img(src = "images/FWER2.png", width = "800px", height = "500px"),
+                                                 
+                                                 HTML(paste0("<br/>", "<br/>", "<br/>",
+                                                      "More information about the Bonferroni method can be found ")),
+                                                 
+                                                 tags$a("here ", href = "https://www.bmj.com/content/310/6973/170.full", target = "_blank"))),
+                                                 
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                                         "<i><center><strong><font color='red'>One-sided vs two-sided tests</font></strong></i></center>",
-                                                                         "<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                                         "In statistical significance testing, a one-tailed test and a two-tailed test are alternative ways of computing the statistical significance of a parameter inferred from a data set, in terms of a test statistic. 
-                                                                         A two-tailed test is appropriate if the estimated value may be more than or less than the reference value, for example, whether a test taker may score above or below the historical average. 
-                                                                         A one-tailed test is appropriate if the estimated value may depart from the reference value in only one direction, for example, whether a machine produces more than one-percent defective products.
-                                                                         Alternative names are one-sided and two-sided tests; the terminology 'tail' is used because the extreme portions of distributions, where observations lead to rejection of the null hypothesis,
-                                                                         are small and often 'tail off' toward zero as in the normal distribution or 'bell curve'.",
-                                                                         "<br/>", "<br/>", "<br/>",
-                                                                         "In medical research is rarely appropriate to use one-sided test, e.g., when it is (almost) impossible that the mean in one group is higher than
-                                                                          in the other. An example would be a group of mice with food ad libitum and one with a severely restricted diet. A test
-                                                                          comparing mean weight gain in the ad libitum group (\\(\\mu_{1}\\)) with that in the restricted group (\\(\\mu_{2}\\)) should perhaps
-                                                                          be one-sided: \\(\\mu_{1}\\) == \\(\\mu_{2}\\) versus \\(\\mu_{1}\\) > \\(\\mu_{2}\\)."
-                                                   )))),
-                                                 
-                                                 fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>", "<br/>", "<br/>",
-                                                   tags$a("Here ", href="https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-what-are-the-differences-between-one-tailed-and-two-tailed-tests/", target="_blank"),
-                                                   "and ",
-                                                   tags$a(href="http://www.statisticssolutions.com/should-you-use-a-one-tailed-test-or-a-two-tailed-test-for-your-data-analysis/", " here", target = "_blank"),
-                                                           HTML(" , you can find more about this issue, and when it is appropriate to use one-sided test"),
-                                                           "<br/>","<br/>","<br/>","<br/>","<br/>"
+                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>",
+                                                                         "<i><strong><font color='red'>One-sided vs two-sided tests</font></strong></i>",
+                                                                         "<br/>", "<br/>", 
+                                                                         "Consider the example of a group of mice with food ad libitum and another group of similar mice with a severely restricted diet. 
+                                                                            A test comparing mean weight gain in the ad libitum group(\\(\\mu_{1}\\)) with that in the restricted group(\\(\\mu_{2}\\)) 
+                                                                        evaluates the null hypothesis that \\(\\mu_{1}\\)=\\(\\mu_{2}\\).
+                                                                         The alternative hypothesis could be \\(\\mu_{1}\\) \\(\\neq\\) \\(\\mu_{2}\\) (two-sided) or \\(\\mu_{1}\\)>\\(\\mu_{2}\\) (one-sided) or \\(\\mu_{2}\\)>\\(\\mu_{1}\\) (one-sided).
+                                                                          A two-tailed test is appropriate if a difference between groups in both directions is possible and of interest. For instance,
+                                                                        the comparison of two cancer treatments can show an effect in both directions, i.e., treatment A is better than treatment B or treatment B is better than
+                                                                        treatment A. A one-tailed test 
+                                                                         is appropriate if a difference between groups is only possible in one direction and is practically impossible in the other direction. 
+                                                                        In the above weight gain example, a one-sided alternative of \\(\\mu_{1}\\)>\\(\\mu_{2}\\) appears appropriate. In clinical research, one-sided tests are rarely appropriate.",
                                                                          
-                                                                         ))))
+                                                                         "<br/>", "<br/>", "<br/>"
                                                                          
                                                                          
+                                                   )),
                                                  
+                                                HTML("More information about one and two sided tests can be found "),
+                                              tags$a("here", href = "https://www.bmj.com/content/bmj/309/6949/248.full.pdf", target = "_blank"))),
                                                  
+                                              HTML("<br/>","<br/>", "<br/>")
                                                  
                                                  ),
                                         
                                         tabPanel("References",
                                                  fluidRow(
                                                    column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                             "Below are provided links with some interesting articles, websites etc., where more information about statistcal power and p-value interpretation
-                                                             is given.")),
+                                                             "<i><strong><font color='red'>REFERENCES</font></strong></i>")),
                                                  HTML("<br/>","<br/>"),
                                                  tags$a("The p value and the base rate fallacy", href = "https://www.statisticsdonewrong.com/p-value.html", target = "_blank"),
                                                  HTML("<br/>","<br/>"),
@@ -364,30 +420,27 @@ ui <- tagList(
                                                  tags$a("The fickle P value generates irreproducible results", href = "https://www.nature.com/articles/nmeth.3288", target = "_blank"),
                                                  HTML("<br/>","<br/>"),
                                                  tags$a("Observed power, and what to do if your editor asks for post-hoc power analyses", href = "http://daniellakens.blogspot.com/2014/12/observed-power-and-what-to-do-if-your.html", target = "_blank"),
-                                                 HTML("with some linked papers inside which are also very intersting","<br/>","<br/>"),
-                                                 tags$a("Statistical Considerations for Preclinical Studies", href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4466166/", target = "_blank"),
                                                  HTML("<br/>","<br/>"),
-                                                 HTML("Finally there is an extensive e-book provided in the following link, about statistical analysis for biologists"),
+                                                 tags$a("Statistical considerations for preclinical studies", href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4466166/", target = "_blank"),
                                                  HTML("<br/>","<br/>"),
-                                                 tags$a("A biologist's guide to statistical thinking and analysis", href = "http://www.wormbook.org/chapters/www_statisticalanalysis/statisticalanalysis.html#sec1", target = "_blank")))
+                                                 tags$a("A biologist's guide to statistical thinking and analysis", href = "http://www.wormbook.org/chapters/www_statisticalanalysis/statisticalanalysis.html#sec1", target = "_blank"),
+                                                 HTML("<br/>","<br/>")
                                                  
-                                        ),
+                                                 
+                                        ))),
 
-                                                 tabPanel("Software for Sample size and power calculation",
-                                                 HTML(paste0("<br/>","<br/>","<br/>",
-                                                      "<center><strong>G*Power: Statistical Power Analyses for Windows and Mac</strong></center>")),
+                                       tabPanel("Software for Sample size and power calculation",
+                                                 HTML(paste0("<br/>","<br/>",
+                                                      "There are 2 free softwares that are widely used for sample size calculations.",
+                                                      "<br/>","<br/>","<br/>")),
                                                  
-                                                 fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>",
-                                                             "G*Power calculates sample size for many different tests. G*Power also computes effect sizes and
-                                                             displays graphically the results of sample size calculations.",
-                                                             "<br/>",
-                                                             "G*Power is a freely available in the following link:",
-                                                             "<br/>","<br/>","<br/>")))),
-                                                             a("G*Power link", href="http://www.gpower.hhu.de/", target = "_blank")
+                                                             a("G*Power", href="http://www.gpower.hhu.de/", target = "_blank"),
+                                                            HTML("<br/>","<br/>","<br/>"),
+                                                             a("PS: Power and Sample Size Calculation", href="http://biostat.mc.vanderbilt.edu/wiki/Main/PowerSampleSize", target = "_blank")
 
                                                  ))
-                                                 ),
+                                                 )
+                                        ,
                           
                            tabPanel("Mean/Median Analysis",  value = "Page4",
                                     withMathJax(),
@@ -396,175 +449,188 @@ ui <- tagList(
                                       tabPanel("Basic information",
                                                fluidRow(
                                                  column(8, HTML(paste0("<br/>","<br/>", "<br/>",
-                                                           "T-test and Wilcoxon-Mann-Whitney test compare two groups, while ANOVA and Kruskal-Wallis test compare more than two groups with respect to mean or median values of the outcome respectively.
-                                                           T-test and ANOVA are parametric tests that rely on certain assumptions and these assumptions need to be met to obtain reliable test results. Validation of these assumptions becomes impossible when the sample is small, which is generally the case with animal experiments.
-                                                           Then, a researcher should use non-parametric tests instead, namely the Mann-Whitney-Wilcoxon or Kruskal-Wallis test. In an experiment with more than two groups of mice, the researcher wants to do all the possible pairwise comparisons and find out which groups are different from each other. 
-                                                           Therefore,  the Wilcoxon-Mann-Whitney test can be used for those pairwise comparisons, in order to find the groups with significantly different median values of the outcome of interest.",
-                                                           "<br/>","<br/>","<br/>")))),
-                                               
-                                               tags$a(href="https://www.analyticsvidhya.com/blog/2017/11/a-guide-to-conduct-analysis-using-non-parametric-tests/", "Here", target = "_blank"),
-                                               HTML(" and "),
-                                               tags$a(href="http://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704_nonparametric/BS704_Nonparametric4.html", "Here", target = "_blank"),
-                                               
-                                               HTML(" , you can find more details about the Wilcoxon-Mann-Whitney test and non-parametric tests",
-                                               "<br/>","<br/>","<br/>","<br/>","<br/>"),
+                                                           "T-test and Mann-Whitney-Wilcoxon tests compare the mean or median of an outcome variable between two groups while ANOVA and Kruskal-Wallis test compare 
+                                                           more than two groups. T-test and ANOVA are parametric tests that rely on certain distributional assumptions to obtain reliable test results. 
+                                                           Validation of these assumptions becomes impossible when group sizes are  small, which is the case with most animal experiments. 
+                                                           Then, non-parametric tests should be used instead, namely Mann-Whitney-Wilcoxon or Kruskal-Wallis tests.",
+                                                           "<br/>","<br/>",
+                                                           "In an experiment with more than two groups
+                                                           of mice, the Kruskal-Wallis test indicates if at least one group differs from others (heterogeneity). To find the groups which differ, 
+                                                           pairwise comparisons can be performed using Mann-Whitney-Wilcoxon tests.
+                                                           However, conducting multiple pairwise tests increases the overall probability of a false positive result (type 1 error), see ",
+                                                           
+                                                           tags$a("Multiple Comparisons.", onclick = "customHref('Page2');customHref('tab3');"),
+                                                           
+                                                           "To control this type 1 error at sufficient statistical power, a larger sample size is needed.",
+                                                           "<br/>","<br/>")))),
                                                
                                                fluidRow(
-                                                 column(8, HTML(paste0("However, one needs to be aware that conducting multiple pairwise tests increases the probability of a false positive result and a correction of the significance level \\(\\alpha\\) should be implemented. 
-                                                           The most popular correction is the Bonferroni adjustment which divides the \\(\\alpha\\) by the total number of comparisons performed.
-                                                           For instance, in an experiment with three treatment groups (A, B, C), three pairwise comparisons can be performed (A-B, A-C, B-C). 
-                                                           For an overall \\(\\alpha\\) of 0.05, i.e. a maximally 5% chance that at least one of the comparisons resulting  in a false positive conclusion, a significance level of \\(\\alpha\\)/(number of comparisons)=0.05/3=0.0167
-                                                           for each pairwise test should be used.",
-                                                           "<br/>","<br/>","<br/>",
-                                                           tags$a(href="http://www.biostathandbook.com/multiplecomparisons.html", "Here", target = "_blank"),
-                                                           
-                                                           HTML(" , you can find more about this and some alternative solutions to the multiple comparisons issue."),
-                                                           "<br/>","<br/>","<br/>","<br/>","<br/>"))))
-                                                           
+                                                 column(8, HTML("More information about the Mann-Whitney-Wilcoxon test can be found "),
+                                                    
+                                               tags$a(href="http://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704_nonparametric/BS704_Nonparametric4.html", "here", target = "_blank")))
+                                                          
                                                ),
-                                               
                                       
                                       tabPanel("Example", value = 'Example_means',
-                                               HTML(paste0("<br/>","<br/>","<br/>",
-                                                           "<center><i><strong><font color='blue'>For 2 groups</font></strong></i></center>")),
-                                               h5("Example:"),
+                                               HTML(paste0("<br/>","<br/>",
+                                                           "<i><strong><font color='blue'>For 2 groups</font></strong></i>")),
+                                               
                                                fluidRow(
-                                                 column(8, HTML("A scientist wants to test the hypothesis that a novel compound reduces high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J strain of mice. Therefore she wants to conduct a new study
-                                                    by randomizing mice to control treatment groups, in order to compare the average HDL cholesterol levels from the two groups. From a previous experiment, the following measurements of HDL are observed:",
+                                                 column(8, HTML("<br/>",
+                                                                "A scientist wants to test the hypothesis that a novel compound reduces high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J strain of mice.
+                                                                Therefore, a new study is planned where mice will be  randomized to a control and a treatment group, in order to compare the average HDL cholesterol levels 
+                                                                between both groups. In an experiment, the following measurements of HDL were observed:",
                                                "<br/>", "<br/>","<br/>"))),
+                                               
                                                fluidRow(
                                                  column(6, DTOutput("Example_1"))),
                                                
                                                fluidRow(
                                                  column(8, HTML("<br/>", "<br/>","<br/>",
-                                                    "These data can be used to calculate the required sample size for the new experiment. The following information from the observed previous data is needed: ",
+                                                    "Analysis of such  data can be carried out using the GraphPad software and following the steps described "),
+                                                    
+                                                    tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?stat_how_to_do_an_unpaired_t_test_w_3.htm",
+                                                           "here", target = "_blank"),
+                                                    
+                                                    
+                                                    HTML("<br/>", "<br/>","<br/>",
+                                               
+                                               
+                                                    
+                                                    "The following information from these data can be used to calculate the required sample size for a new experiment: ",
                                                     "<ol>
-                                                      <li>Mean in group A (Control)</li>
-                                                      <li>Mean in group B (Treatment)</li>
-                                                      <li>Standard Deviation in group A</li>
-                                                      <li>Standard Deviation in group B</li>
+                                                      <li>Mean HDL in control group </li>
+                                                      <li>Mean HDL in treatment group </li>
+                                                      <li>Standard deviation HDL in control group </li>
+                                                      <li>Standard deviation HDL in treatment group </li>
                                                       </ol>",
-                                                    "<br/>", "<br/>","<br/>",
-                                                    "Further, the power level and the significance level(\\(\\alpha\\)) of a test, or in other words, the desired Type-I error, need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%.",
-                                                    "<br/>","<br/>","<br/>","<br/>","<br/>"))),
+                                                    "<br/>", "<br/>","<br/>"
+                                                    ))),
                                                
                                                
-                                               HTML("<center><i><strong><font color='blue'>For more than 2 groups</font></strong></i></center>"),
-                                               h5("Example:"),
+                                               HTML("<i><strong><font color='blue'>For more than 2 groups</font></strong></i>"),
+                                               
                                                fluidRow(
-                                                 column(8, HTML("A scientist wants to test the hypothesis that two novel compounds reduce high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J strain of mice.
-                                                    Therefore she wants to conduct a new study by randomizing mice to control and two treatment groups, in order to compare the average HDL cholesterol levels from the three groups. 
-                                                    From a previous experiment, the following measurements of HDL are observed:",
+                                                 column(8, HTML("<br/>", "A scientist wants to test the hypothesis that two novel compounds reduce high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J 
+                                                    strain of mice. Therefore a new study is planned where mice will be randomized to the two treatment groups and an untreated group, in order to compare the average HDL cholesterol 
+                                                    levels between the three groups. During an experiment, the following measurements of HDL are observed:",
                                                     "<br/>", "<br/>","<br/>"))),
+                                               
                                                fluidRow(
                                                  column(6, DTOutput("Example_2"))),
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>","<br/>",
-                                                    "In case of more than two groups, sample size is based on the two groups with the smallest difference between the mean of the outcome because a larger sample is required to detect a smaller effect. If an experiment is powered for the smallest difference,
-                                                    it is also powered to detect a larger difference. After finding these 2 groups, the procedure is exactly the same as in the case of 2 groups.",
-                                                    "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"))),
+                                                 column(8, HTML("<br/>", "<br/>",
+                                                    "For an experiment with more than two groups,  the required sample size can be calculated using information about  the two groups 
+                                                    with the smallest difference between the average  outcome, i.e., HDL. If an experiment is powered for the smallest difference, 
+                                                    it is also powered to detect a larger difference, but multiple comparisons should be taken into account (see "),
+                                                    
+                                                    tags$a("Multiple Comparisons).", onclick = "customHref('Page2');customHref('tab3');"),
+                                                    
+                                                    HTML("<br/>", "<br/>",
+                                                         "Usually, a control group is also included in the experiment. If the controls are only technical controls and not of direct
+                                                         interest, it is not necessary to include them as a group in the
+                                                         analysis and in the adjustment of the type 1 error.",
+                                                          "<br/>", "<br/>","<br/>")))
                                                
-                                               fluidRow(
-                                                 column(6, HTML(paste0("The analysis of this data can be carried out using the Wilcoxon-Mann-Whitney test in GraphPad.
-                                                                       The link below is from the documentation of the software, where the steps are clearly defined.",
-                                                                       "<br/>", "<br/>","<br/>",
-                                                                       
-                                                                       tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?the_results_of_a_mann-whitney_test.htm",
-                                                                              "How to use Wilcoxon-Mann-Whitney in GraphPad", target = "_blank"),
-                                                                       "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"))))
-                                                                       
+                                                                                                             
                                                ,
                                                
-                                               HTML("<center><i><strong><font color='blue'>Power Calculation Example</font></strong></i></center>"),
+                                               HTML("<i><strong><font color='blue'>Sample size calculation Example</font></strong></i>"),
                                                
                                                
-                                               tags$img(src = "images/PowerExample_WMW.PNG", width = "400px", height = "500px"),
-                                               
-                                               fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>","<br/>",
-                                                    "This is an example of how this app can be used in order to perform sample size calculations. 
-                                                    The image above is from the next tab where the actual sample size calculation can be done. In this interactive panel the required input can provided,
-                                                    and after clicking on <strong><font color='blue'>Go!</font></strong>, the results will appear (it might take a couple of seconds).",
-                                                    "<br/>", "<br/>","<br/>", 
-                                                    "For illustration, we will use the previous example for 2 groups and >2 groups"))),
-                                               #tags$a("Here", onclick = "customHref('Example_means');"),
-                                               
+                                               #tags$img(src = "images/PowerExample_WMW.PNG", width = "400px", height = "500px"),
                                                
                                                fluidRow(
-                                                 column(6, HTML(paste0("<br/>", "<br/>","<br/>",
-                                                    "<center><i><strong><font color='blue'>For 2 groups</font></strong></i></center>",
-                                                    "<br/>", "<br/>","<br/>",
+                                                 column(8, HTML("<br/>", "<br/>",
+                                                    "Calculations of the required sample size can be performed under the Sample Size Calculation tab.  
+                                                    For illustration, we will use  the examples described above."
+                                                    ))),
+                                      
+                                               
+                                               fluidRow(
+                                                 column(6, HTML(paste0("<br/>", "<br/>",
+                                                    "<i><strong><font color='blue'>For 2 groups</font></strong></i>",
+                                                    "<br/>", "<br/>",
                                                     "For this particular example, we have:",
                                                     "<ol>
-                                                    <li>Mean in group A (Treatment) = 267.39</li>
-                                                    <li>Mean in group B (Control) = 283.46</li>
-                                                    <li>Standard Deviation in group A = 14.38</li>
-                                                    <li>Standard Deviation in group B = 11.83</li>
+                                                    <li>Mean HDL in treatment group = 267.39</li>
+                                                    <li>Mean HDL in control group = 283.46</li>
+                                                    <li>Standard Deviation HDL in treatment group = 14.38</li>
+                                                    <li>Standard Deviation HDL in control group = 11.83</li>
                                                     </ol>",
-                                                    "<br/>", "<br/>","<br/>"
+                                                    "<br/>"
                                                     )))),
                                                
+                                               tags$img(src = "images/PowerExample_WMW6.PNG", width = "700px", height = "550px"),
+                                               
+                                               
+                                               HTML("<br/>", "<br/>",
+                                                    "For such an experiment the required sample size is 14 per group.",
+                                                    "<br/>", "<br/>"),
+                                               
                                                fluidRow(
-                                                 column(6,  HTML(paste0("<br/>", "<br/>","<br/>",
-                                                    "<center><i><strong><font color='blue'>For more than 2 groups</font></strong></i></center>",
+                                                 column(6,  HTML(paste0("<br/>",
+                                                    "<i><strong><font color='blue'>For more than 2 groups</font></strong></i>",
                                                     "<br/>", "<br/>","<br/>", 
                                                     "For this particular example, we have:",
                                                     "<ol>
-                                                    <li>Mean in group A (Treatment A) = 267.39</li>
-                                                    <li>Mean in group B (Treatment B) = 256.48</li>
-                                                    <li>Mean in group C (Control)   = 283.46</li>
-                                                    <li>Standard Deviation in group A = 14.83</li>
-                                                    <li>Standard Deviation in group B = 9.75</li>
-                                                    <li>Standard Deviation in group c = 11.83</li>
+                                                    <li>Mean HDL in treatment group A = 267.39</li>
+                                                    <li>Mean HDL in treatment group B = 256.48</li>
+                                                    <li>Mean HDL in treatment group C = 283.46</li>
+                                                    <li>Standard Deviation HDL in treatment group A = 14.83</li>
+                                                    <li>Standard Deviation HDL in treatment group B = 9.75</li>
+                                                    <li>Standard Deviation HDL in treatment group C = 11.83 </li>
                                                     </ol>",
-                                                    "<br/>", "<br/>","<br/>",
-                                                    "We identify the two groups with the smallest difference, namely A and B. Since three pairwise tests will be performed, 
-                                                    the \\(\\alpha\\) is adjusted by 0.05/3 = 0.0166.")))),
-                                               HTML("<br/>", "<br/>","<br/>",
-                                                    "If we now provide the input to the panel at the left, results will show up, as in the image below.",
-                                                    "<br/>", "<br/>","<br/>"),
-                                               
-                                               tags$img(src = "images/PowerExample_WMW2.PNG", width = "600px", height = "200px")
+                                                    "<br/>", "<br/>",
+                                                    "The smallest difference in outcome is between groups A and B. Since three pairwise tests will be performed, an \\(\\alpha\\)
+                                                    value of  0.05/3 = 0.0166 is used.",
+                                                    "<br/>", "<br/>","<br/>")))),
+                                              
+                                               tags$img(src = "images/PowerExample_WMW5.PNG", width = "700px", height = "550px"),
                                                
                                               
-                                        
+                                              HTML("<br/>", "<br/>",
+                                                   "For such an experiment the required sample size is 31 per group.",
+                                                   "<br/>", "<br/>", "<br/>", "<br/>")
                                                
                                                ),
                                               
                                       
-                                      tabPanel( "Power Calculation",
+                                      tabPanel( "Sample Size Calculation",
                                                 sidebarLayout(
                                                   sidebarPanel(
                                                     numericInput( "meanAAA2Input", "Mean of group A", 267.39 ),
-                                                    numericInput( "meanBBB2Input", "Mean of group B", 283.46 ),
+                                                    numericInput( "meanBBB2Input", "Mean of group B", 256.48 ),
                                                     numericInput( "SDAAA2Input", "SD of group A", 14.38 ),
-                                                    numericInput( "SDBBB2Input", "SD of group B", 11.83 ),
+                                                    numericInput( "SDBBB2Input", "SD of group B", 9.75 ),
                                                     selectInput( "type32Input", "Type of test", c("one.sided", "two.sided"), selected = "two.sided"),
                                                     sliderInput( "Power32Input", "Power", min = 0, max = 100, value = 80, step = 1),
-                                                    sliderInput( "error32Input", "Type I error", min = 0, max = 10, value = 5, step = 0.1),
+                                                    sliderInput( "error32Input", "Type I error", min = 0, max = 10, value = 5, step = 0.01),
                                                     #withBusyIndicatorUI(
                                                       actionButton("button2Input", "Go!", class = "btn-primary")
                                                     #)
                                                   ),
-                                                  mainPanel(
+                                                  mainPanel(HTML(paste0("<br/>","<br/>", "Information on how to use this online calculator is provided in the ",
+                                                                 tags$a("Example", onclick = "customHref('Page4');customHref('Example_means');"),
+                                                                        ". This is a simulation based calculation and therefore it might take few seconds depending on the input.")),
                                                     HTML("<br/>", "<br/>","<br/>", 
-                                                         "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
-                                                    uiOutput('dynamic_valueP2',inline = T),
-                                                    HTML("<strong><font color='#4d3a7d'>% power to reject the null hypothesis of equal means when the population
-                                                         mean difference is M1-M2 =</font></strong> "),
-                                                    uiOutput('dynamic_valueD2',inline = T),
-                                                    HTML("<strong><font color='#4d3a7d'>with a standard deviation for group A=</font></strong>"),
+                                                         "<strong><font color='#4d3a7d'>Means for group A and B are assumed to be </font></strong>"),
+                                                    uiOutput('dynamic_valueM1',inline = T),
+                                                    HTML("<strong><font color='#4d3a7d'> and</font></strong>"),
+                                                    uiOutput('dynamic_valueM2',inline = T),
+                                                    HTML("<strong><font color='#4d3a7d'> respectively, while standard deviations are </font></strong>"), 
                                                     uiOutput('dynamic_valueSDA2',inline = T),
-                                                    HTML("<strong><font color='#4d3a7d'>and group B=</font></strong>"),
+                                                    HTML("<strong><font color='#4d3a7d'> for group A and </font></strong>"), 
                                                     uiOutput('dynamic_valueSDB2',inline = T),
-                                                    HTML("<strong><font color='#4d3a7d'>and with a significance level (a) of</font></strong>"),
+                                                    HTML("<strong><font color='#4d3a7d'> for group B. To detect the population mean difference of M1-M2 = </font></strong>"), 
+                                                    uiOutput('dynamic_valueD2',inline = T),
+                                                    HTML("<strong><font color='#4d3a7d'> with an \\(\\alpha\\) of </font></strong>"), 
                                                     uiOutput('dynamic_valueA2',inline = T),
-                                                    HTML("<strong><font color='#4d3a7d'>%</font></strong>"),
-                                                    HTML("<br/>", "<br/>","<br/>"),
-                                                    h4("The required sample size per group, calculated based on Wilcoxon rank-sum test, is:",
-                                                       style = "font-family: 'Lobster', cursive;
-                                                       font-weight: 500; line-height: 1.1; 
-                                                       color: #4d3a7d;"), withSpinner(verbatimTextOutput('results32')), 
+                                                    HTML("<strong><font color='#4d3a7d'>% and </font></strong>"), 
+                                                    uiOutput('dynamic_valueP2',inline = T),
+                                                    HTML("<strong><font color='#4d3a7d'>% power based on a Mann-Whitney-Wilcoxon test, the required sample size per group is: </font></strong>"), 
+                                                    HTML("<br/>", "<br/>"),
+                                                    withSpinner(verbatimTextOutput('results32')), 
                                                     br(), br()
                                                     #plotOutput("coolplot32")
                                                     )))
@@ -576,20 +642,18 @@ ui <- tagList(
                                                tabsetPanel(
                                                  tabPanel("Basic information",
                                                           fluidRow(
-                                                            column(8,  HTML(paste0("<br/>","<br/>","<br/>",
-                                                                  "The logrank test is used to test the null hypothesis that there is no difference between the populations in the probability of an event
-                                                                  (i.e. death, tumor surpassing a pre-defined volume) at any time point. Hence, the total survival distributions area compared and not just the
-                                                                  proportions surviving at any specific time-point.
-                                                                  The logrank test is most likely to detect a difference between groups when the risk of an event is consistently greater for one group than another, 
-                                                                  while it is unlikely to detect a difference when survival curves cross.
-                                                                  In mice experiments, for each mouse, the time is measured from the start of the experiment, e.g., randomization, until the mouse dies or is sacrificed. 
-                                                                  For mice who are still alive at the end of the study, the time between start and end of the study is used, but is labeled 'censored'
-                                                                  so that their time is not considered a time to death.",
+                                                            column(8,  HTML(paste0("<br/>","<br/>",
+                                                                  "The log-rank test is used to test the null hypothesis that the time to an event (e.g., death or a tumor exceeding a pre-defined volume)
+                                                                  between groups of mice is equal. For each mouse, the survival time is measured from the start of the experiment, for example from the time of 
+                                                                  randomization, until the mouse experiences the outcome of interest  or is sacrificed or the experiment ends. For mice that do not experience 
+                                                                  the outcome during the study duration, the time to the outcome event is unknown and therefore their survival time is censored.
+                                                                  The log-rank test compares differences in survival time based on the hazard ratio as a measure of effect size.
+                                                                  The hazard ratio equals the ratio of the median survival times in both groups for exponential survival distributions.",
                                                                   "<br/>","<br/>","<br/>",
                                                                       
                                                                       tags$a(href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC403858/", "Here", target = "_blank"),
                                                                       
-                                                                      HTML(" , you can find more details about the <i>log-rank test</i>.",
+                                                                      HTML(" , you can find more information about the log-rank test.",
                                                                       "<br/>","<br/>","<br/>","<br/>","<br/>")
                                                                       ))))
                                                           
@@ -597,156 +661,100 @@ ui <- tagList(
                                                  
                                                  tabPanel("Example", value = 'Example_surv', 
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                          
-                                                          "To evaluate whether treatment with paclitaxel improves survival after esophageal adenocarcinoma (EAC), a scientist uses a peritoneal dissemination xenograft mouse model and injects human EAC cell lines intraperitoneally/subcutaneously into SCID mice.
-                                                                Two weeks later, mice are randomly assigned to treatment by vehicle or paclitaxel (20mg/kg, 2 times a week for 2 weeks). 
-                                                               Mice are followed until death or the end of the study and  the mouse survival times are compared between the 2 groups.",
+                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                          "To evaluate whether the chemotherapeutic agent  paclitaxel improves survival after esophageal adenocarcinoma (EAC), 
+                                                          a scientist uses a peritoneal dissemination xenograft mouse model and injects human EAC cell lines intraperitoneally
+                                                          into severe combined immunodeficiency (SCID) mice. Two weeks later, the mice are randomly assigned to either 
+                                                          vehicle or paclitaxel (20mg/kg, 2 times a week for 2 weeks) groups. Mice are followed until death or the end of the study duration
+                                                          to compare the survival distributions  between the two  groups.",
                                                           "<br/>","<br/>","<br/>")))),
                                                           fluidRow(
                                                             column(6, DTOutput("Surv_Example_1"))),
+                                                          
+                                                          fluidRow(
+                                                            column(6, HTML("<br/>","<br/>",
+                                                                           "Analysis of such data can be carried out using the GraphPad software and following the steps described "),
+                                                                                  
+                                                                                  tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?stat_key_concepts__survival_curves.htm",
+                                                                                         "here", target = "_blank")
+                                                                                  )),
 
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                              "For the power calculation based on a logrank test information about the median survival in each group is required. 
-                                                               Moreover, total experiment time is needed, which is the planned duration of the experiment. Further, the power level and the significance level (\\(\\alpha\\)) of the test,
-                                                               or, in other words, the desired Type-I error, need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%.Therefore, we need:",
-                                                               "Therefore, we need:",
-                                                               "<br/>", "<br/>","<br/>",
+                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                              "To calculate the sample size for a new experiment the following information is needed:",
+                                                               "<br/>", "<br/>",
                                                                "<ol>
-                                                               <li>	Median Survival in group A  (Control)</li>
-                                                               <li>	Median Survival in group B (Treatment)</li>
-                                                               <li>	Duration of experiment </li>
+                                                               <li>	Median survival time in the control group </li>
+                                                               <li>	Median survival time in the treatment group</li>
+                                                               <li>	Duration of the experiment </li>
                                                                <li>	Power level </li>
                                                                <li>	Significance level </li>
                                                                </ol>",
-                                                               "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"
-                                                               )))),
-                                                          
-                                                          
-                                                          fluidRow(
-                                                            column(6, HTML(paste0("The analysis of this data can be carried out using methods for survival analysis in GraphPad.
-                                                                       The link below is from the documentation of the software, where the steps are clearly defined.",
-                                                                                  "<br/>", "<br/>","<br/>",
-                                                                                  
-                                                                                  tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?survival_curves.htm",
-                                                                                         "How to do survival analysis in GraphPad", target = "_blank"),
-                                                                                  "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"))))
+                                                               "<br/>", "<br/>","<br/>"
+                                                               ))))
                                                           
                                                           ,
                                                           
                                                           
-                                                          HTML("<center><i><strong><font color='blue'>Power Calculation Example</font></strong></i></center>"),
+                                                          HTML("<i><strong><font color='blue'>Sample size calculation example</font></strong></i>"),
                                                           
-                                                          tags$img(src = "images/PowerExample_LRT.PNG", width = "350px", height = "500px"),
                                                           
                                                           fluidRow(
-                                                            column(8, HTML("<br/>", "<br/>","<br/>",
-                                                               "This is an example of how this app can be used in order to perform sample size calculations. 
-                                                               The image above is from the next tab where the actual sample size calculation can be done. In this interactive panel the required input can provided,
-                                                               and the results will appear.",
-                                                               "<br/>", "<br/>","<br/>", 
-                                                               "We show the calculation of the required sample size for the previous example"))),
-                                                          #tags$a("Here", onclick = "customHref('Example_surv');"),
+                                                            column(8, HTML("<br/>", "<br/>",
+                                                               "Calculations of the required sample size can be performed using this website under the sample size calculation tab.
+                                                               For illustration, we will use the example described above.",
+                                                               "<br/>"))),
                                                           
-                                                          HTML("<br/>", "<br/>","<br/>",
+                                                          HTML("<br/>", "<br/>",
                                                                "For this particular example, we have:",
                                                                "<ol>
-                                                                   <li>Median Survival in group A (Treatment) = 25.5 days</li>
-                                                                   <li>Median Survival in group B (Control) = 35 days</li>
-                                                                   <li>Duration of experiment = 60 days</li>
+                                                                   <li>Median Survival in the control group = 18.5 days</li>
+                                                                   <li>Median Survival in the treatment group = 40.5 days</li>
+                                                                   <li>Duration of the experiment = 60 days</li>
                                                                    </ol>",
                                                                "<br/>", "<br/>","<br/>")
                                                           
                                                           ,
-                                                 HTML("<br/>", "<br/>","<br/>",
-                                                      "If we now provide the input to the panel at the left, results will show up, as in the image below.",
-                                                      "<br/>", "<br/>","<br/>"),
                                                  
-                                                 tags$img(src = "images/PowerExample_LRT2.PNG", width = "600px", height = "300px")
+                                                 tags$img(src = "images/PowerExample_LRT3.PNG", width = "600px", height = "500px"), 
+                                                 
+                                                 
+                                                 
+                                                 
+                                                 tags$img(src = "images/PowerExample_LRT6.png", width = "800px", height = "300px")
                                                  
                                                  ),
                                                  
                                                  
-                                                 tabPanel("Power Calculation",
+                                                 tabPanel("Sample Size Calculation",
                                                           sidebarLayout(
                                                             sidebarPanel(
-                                                              numericInput( "MedA1Input", "Median survival of group A-days", 60 ),
-                                                              numericInput( "MedB1Input", "Median survival of group B-days", 30 ),
-                                                              numericInput( "FT1Input", "Experiment's duration-days", 100 ),
+                                                              numericInput( "MedA1Input", "Median survival of group A", 18.5 ),
+                                                              numericInput( "MedB1Input", "Median survival of group B", 40.5 ),
+                                                              numericInput( "FT1Input", "Experiment's duration", 60 ),
                                                               sliderInput( "Power1InputS", "Power", min = 0, max = 100, value = 80, step = 1),
-                                                              sliderInput( "error1InputS", "Type I error", min = 0, max = 10, value = 5, step = 1)
+                                                              sliderInput( "error1InputS", "Type I error", min = 0, max = 10, value = 5, step = 0.01)
                                                               
                                                             ),
                                                             
-                                                            mainPanel(
+                                                            mainPanel(HTML(paste0("<br/>","<br/>", "Information on how to use this online calculator is provided in the ",
+                                                                           tags$a("Example", onclick = "customHref('Page5');customHref('Example_surv');"))),
                                                               HTML("<br/>", "<br/>","<br/>", 
-                                                                   "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
-                                                              uiOutput('sdynamic_valueP',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'>% power at a </font></strong> "),
-                                                              uiOutput('sdynamic_valueAlp',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'>% significance level to detect a hazard ratio of </font></strong> "),
-                                                              uiOutput('sdynamic_valueHR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> when the control group median survival is</font></strong>"),
+                                                                   "<strong><font color='#4d3a7d'>The median survival time of the control group is expected to be </font></strong>"),
                                                               uiOutput('sdynamic_valueA',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> days for a study that lasts for</font></strong>"),
+                                                              HTML("<strong><font color='#4d3a7d'> days and the total duration of the experiment is assumed to be </font></strong> "),
                                                               uiOutput('sdynamic_valueFT',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> days.</font></strong>"),
+                                                              HTML("<strong><font color='#4d3a7d'> days. To detect the ratio between the median survival time of the treatment group to control group of </font></strong> "),
+                                                              uiOutput('sdynamic_valueHR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> with an \\(\\alpha\\) of </font></strong>"),
+                                                              uiOutput('sdynamic_valueAlp',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>% and </font></strong>"),
+                                                              uiOutput('sdynamic_valueP',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>% power based on a logrank test, the required sample size per group is:  </font></strong>"),
                                                               HTML("<br/>", "<br/>","<br/>"),
-                                                              h4("The required sample size per group is:",
-                                                                 style = "font-family: 'Lobster', cursive;
-                                                                 font-weight: 500; line-height: 1.1; 
-                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsSurv1'),
-                                                              
-                                                              br(), br()
-                                                              #plotOutput("Survcoolplot33")
-                                                              ))
-                                                          )
-                                                 #tabPanel("Log-rank VS Wilcoxon-Mann-Whitney",
-                                                #          HTML(paste0("<br/>","<br/>","<br/>",
-                                                #                      "In the data that from the example ")),
-                                                #         tags$a("here", onclick = "customHref('Example_surv');"),
-                                                #         HTML("we observe that all the mice in the control group have experienced the event of interest during the experiment, 
-                                                #               while in the treatment group we have 3 mice that are censored. Two mice have died early but from reasons unrelated 
-                                                #               to the experiment and one mouse was still alive at the end of the experiment. Because of the presence of censoring,
-                                                #               the log-rank test is the only test that we should use. I order to prove that, we will analyze this data with both the
-                                                #              log-rank test and a simple Wilcoxon-Mann-Whitney.",
-                                                #              "<br/>", "<br/>","<br/>"),
-                                                #         HTML("<center><i><strong><font color='blue'>Log-rank test</font></strong></i></center>"),
-                                                #         verbatimTextOutput("Surv_Example_2"),
-                                                #         
-                                                #         
-                                                #         HTML("<br/>", "<br/>","<br/>",
-                                                #              "<center><i><strong><font color='blue'>Wilcoxon test</font></strong></i></center>"),
-                                                #         verbatimTextOutput("Surv_Example_3"),
-                                                #         HTML("So, we see that the log-rank test is significant at the 5% significance level while the Wilcoxon test is not, based on their p-values. 
-                                                #             Intuitively this can be explained from the fact that we have 2 early deaths in the treatment group which are not related to our experiment 
-                                                #             and thus they are considered censored. This can be seen from the log-rank test which can handle the censoring but not from the t-test which just compares 
-                                                #             the times from the 2 groups and does not take into account the censoring. Therefore, we see that when there is censoring in the data, 
-                                                #             log-rank test (or any other survival analysis test) is the only choice.",
-                                                #              "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>",
-                                                #             "Let's now consider another example.",
-                                                #             "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"),
-                                                #         fluidRow(
-                                                #           column(6, DTOutput("Surv_Example_4"))),
-                                                #         HTML("<br/>", "<br/>","<br/>","<br/>",
-                                                #               "Here we have 39 mice, 21 in control and 18 in treatment respectively, and all them have experienced the event except one mice in the treatment group
-                                                #               which has died from other causes early in the study. We analyze these data again with both log-rank test and Wilcoxon."),
-                                                #         HTML("<br/>", "<br/>","<br/>",
-                                                #              "<center><i><strong><font color='blue'>Log-rank test</font></strong></i></center>"),
-                                                #         verbatimTextOutput("Surv_Example_5"),
-                                                          
-                                                          
-                                                #         HTML("<br/>", "<br/>","<br/>",
-                                                #              "<center><i><strong><font color='blue'>Wilcoxon test</font></strong></i></center>"),
-                                                #         verbatimTextOutput("Surv_Example_6"),
-                                                #         
-                                                #          HTML("<br/>", "<br/>","<br/>",
-                                                #                           "Here both tests are highly significant in the 5% significance level. Here we have only 1 out of the 39 mice censored and this does not affect the conclusion 
-                                                #              that we make with both tests. Of course, this would cause a problem if the sample size here was smaller, because each mouse would put more weight on the tests.",
-                                                #             "<br/>", "<br/>","<br/>")
-                                                          
-                                                #         )
+                                                              verbatimTextOutput('resultsSurv1')
+                                                                                               
+                                                              )))
                                                           
                                                  )),
        
@@ -758,122 +766,116 @@ ui <- tagList(
                                                  tabPanel("Basic information",
                                                           fluidRow(
                                                             column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                                        "Proportion analysis is used when the goal is to compare two groups of mice based on a categorical outcome, i.e. complete responders: yes/no.
-                                                                        The simplest statistical test for this purpose is the Z-test for two proportions.The null hypothesis H0 states that the two population proportions are the same;
-                                                                        in other words, that their difference is equal to 0. The notation for the null hypothesis is H0: p1 = p2, where p1 is the proportion from the first population, and p2 is the proportion from the second population.",
+                                                                        "When the outcome is binary, the comparison of groups is a comparison of proportions. 
+                                                                        For example, after treatment, mice can have
+                                                                        a complete response (coded as 1) or not complete response (coded as 0). This situation can be analyzed with a Z-test comparing the 
+                                                                        proportions of responding mice between two different treatments. But because of the small sample sizes that are usually used
+                                                                        in mice experiments, it is more appropriate to use the <strong>Fisher's exact test</strong>",
                                                                         "<br/>","<br/>","<br/>"
                                                                                )))), 
-                                                          tags$a(href="https://www.dummies.com/education/math/statistics/how-to-compare-two-population-proportions/", "Here", target = "_blank"),
                                                           
-                                                          HTML(" , you can find more details about the Z-test for proportions",
-                                                               "<br/>","<br/>","<br/>","<br/>","<br/>")),
+                                                          
+                                                          HTML("More information about the Z-test for proportions can be found "),
+                                                               
+                                                          
+                                                          tags$a(href = "https://www.statisticshowto.datasciencecentral.com/z-test/", "here", target = "_blank"),
+                                                          
+                                                          
+                                                          HTML("and about the Fisher's exact test "),
+                                                          
+                                                          
+                                                          tags$a(href = "http://www.biostathandbook.com/fishers.html", "here", target = "_blank")
+                                                          ),
                                                  
                                                tabPanel("Example", value = 'Example_prop',
                                                         fluidRow(
-                                                          column(8, HTML(paste0("<br/>","<br/>","<br/>", 
-                                                                                "A scientist wants to test the hypothesis that a new combination treatment is able to completely regress tumor more efficiently compared with a control.
-                                                                                As complete responders are considered those mice
-                                                                                that do not have palpable tumors for 14 days. The proportions of complete responders are compared between treatment groups. 
-                                                                                A subset of the data from a previous experiment is presented below, where <i>Treatment</i> denotes the group each mouse belongs to and the <i>CR</i> states 
-                                                                                if that mouse was a complete responders (CR=1) or not (CR=0).",
+                                                          column(8, HTML(paste0("<br/>","<br/>",
+                                                                                "A scientist wants to test the hypothesis that a new combination treatment leads to a higher proportion of tumor regression compared
+                                                                                with a standard treatment . Mice that do not have palpable tumors for 14 days are considered responders. The proportions of responders 
+                                                                                are compared between treatment groups. The data from an experiment are presented below.",
                                                                                 
                                                                                 "<br/>","<br/>","<br/>")))), 
                                                                                 
-                                                                                fluidRow(
-                                                                                  column(12, DTOutput("ExamplePrp_1"))),
-                                                                                
                                                         fluidRow(
-                                                          column(8, HTML(paste0("<br/>","<br/>","<br/>","<br/>","<br/>","<br/>", 
-                                                                                
-                                                                                "This information can be used to calculate the required sample size for the new experiment.
-                                                                                Further, the power level and the significance level  \\(\\alpha\\) of a test, or in other words, the desired Type-I error,
-                                                                                need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%")))),
-                                               
+                                                          column(12, div(DTOutput("ExamplePrp_11"), style = "width: 50%"))),
+                                                        
+                                                        
                                                         
                                                         fluidRow(
-                                                          column(6, HTML(paste0("The analysis of this data can be carried out using the Wilcoxon-Mann-Whitney test in GraphPad.
-                                                                       The link below is from the documentation of the software, where the steps are clearly defined.",
-                                                                                "<br/>", "<br/>","<br/>",
+                                                          column(6, HTML(paste0("<br/>","<br/>",
+                                                                                "Analysis of such data can be carried out using the GraphPad software and following the steps described ")),
+                                                                 
+                                                                 
+                                                                 tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?contingency_tables.htm",
+                                                                        "here.", target = "_blank"))),
                                                                                 
-                                                                                tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?contingency_tables.htm",
-                                                                                       "How to compare proportions in GraphPad", target = "_blank"),
-                                                                                "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>"))))
-                                                        
-                                                        ,
-                                                        
-                                                        
-                                               HTML("<br/>","<br/>","<br/>", "<center><i><strong><font color='blue'>Power Calculation Example</font></strong></i></center>",
-                                                    "<br/>","<br/>","<br/>"),
+                                                        fluidRow(
+                                                          column(8, HTML(paste0("<br/>","<br/>", 
+                                                                                "To calculate the required sample size for a new similar experiment, 
+                                                                                the proportions of responding mice in control and treatment group need to be estimated from that data.")))),
                                                
-                                               tags$img(src = "images/PowerExample_PROP1.PNG", width = "350px", height = "500px"),
+                                                        
+                                               HTML("<br/>","<br/>","<br/>", "<i><strong><font color='blue'>Sample Size calculation example</font></strong></i>"
+                                                    ),
+                                               
                                                
                                                fluidRow(
                                                  column(8, HTML("<br/>", "<br/>","<br/>",
-                                                                "This is an example of how this app can be used in order to perform sample size calculations. 
-                                                               The image above is from the next tab where the actual sample size calculation can be done. In this interactive panel the required input can provided,
-                                                               and the results will appear.",
-                                                                "<br/>", "<br/>","<br/>", 
-                                                                "We show the calculation of the required sample size for the previous example"))),
+                                                                "Calculations of the required sample size can be performed under the Sample Size Calculation tab.
+                                                                For illustration, we will use the example described above.",
+                                                                "<br/>", "<br/>","<br/>"))), 
+                                                                
 
-                                               HTML("<br/>", "<br/>","<br/>",
-                                                    "For this particular example, we have:",
-                                                    "<ol>
-                                                                   <li>Proportion in group A (Control) = 10%</li>
-                                                                   <li>Proportion in group B (New Treatment) = 30% </li>
-                                                                   </ol>")
+                                               HTML("<ol>
+                                                    <li>Proportion responders after standard treatment = 10%</li>
+                                                    <li>Proportion responders after new combination treatment = 30% </li>
+                                                    </ol>", 
+                                                    "<br/>", "<br/>","<br/>")
                                                     
                                                ,
-                                               HTML("<br/>", "<br/>","<br/>",
-                                                    "If we now provide the input to the panel at the left, results will show up, as in the image below.",
-                                                    "<br/>", "<br/>","<br/>"),
                                                
-                                               tags$img(src = "images/PowerExample_PROP2.PNG", width = "600px", height = "300px")
-                                               
+                                               tags$img(src = "images/PowerExample_PROP1.PNG", width = "350px", height = "500px"),
+                                               HTML("<br/>", "<br/>"),
+                                               tags$img(src = "images/PowerExample_PROP6.png", width = "900px", height = "300px")
+
                                                ),
                                                
                                               
-                                               tabPanel("Power Calculation",
+                                               tabPanel("Sample Size Calculation",
                                                         sidebarLayout(
                                                           sidebarPanel(
-                                                            numericInput( "Prop1Input", "Proportion in group A", 0.1, min = 0, max = 1 ),
-                                                            numericInput( "Prop2Input", "Proportion in group B", 0.3, min = 0, max = 1 ),
+                                                            numericInput( "Prop1Input", "Proportion in group A", 0.1, min = 0.05, max = 0.95, step = 0.05 ),
+                                                            numericInput( "Prop2Input", "Proportion in group B", 0.3, min = 0.05, max = 0.95, step = 0.05 ),
                                                             sliderInput( "Power1InputP", "Power", min = 0, max = 100, value = 80, step = 1),
-                                                            sliderInput( "error1InputP", "Type I error", min = 0, max = 10, value = 5, step = 1)
-                                                            
+                                                            sliderInput( "error1InputP", "Type 1 error", min = 0, max = 10, value = 5, step = 0.1),
+                                                            actionButton("buttonPrInput", "Go!", class = "btn-primary")
                                                           ),
                                                           
-                                                          mainPanel(HTML("<br/>", "<br/>","<br/>", 
-                                                                         "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
-                                                                    uiOutput('Pdynamic_valuePOW',inline = T),
-                                                                    HTML("<strong><font color='#4d3a7d'>% power at a </font></strong> "),
-                                                                    uiOutput('Pdynamic_valueALP',inline = T),
-                                                                    HTML("<strong><font color='#4d3a7d'>% significance level to detect a difference between the group proportions of </font></strong> "),
-                                                                    uiOutput('Pdynamic_valueDP1',inline = T),
-                                                                    HTML("<strong><font color='#4d3a7d'> when the proportion in group 1 is</font></strong>"),
+                                                          mainPanel(HTML(paste0("<br/>","<br/>", "Information on how to use this online calculator is provided in the ",
+                                                                         tags$a("Example", onclick = "customHref('Page6');customHref('Example_prop');"),
+                                                                         ". This is a simulation based calculation and therefore it might take few seconds depending on the input.")),
+                                                            
+                                                            HTML("<br/>", "<br/>","<br/>", 
+                                                                         "<strong><font color='#4d3a7d'>The proportions in two groups are expected to be </font></strong>"),
                                                                     uiOutput('Pdynamic_valueP1',inline = T),
-                                                                    HTML("<strong><font color='#4d3a7d'> and the proportion in group 2 is</font></strong>"),
+                                                                    HTML("<strong><font color='#4d3a7d'> and </font></strong> "),
                                                                     uiOutput('Pdynamic_valueP2',inline = T),
-                                                                    
-                                                                    
-                                                                    h4("The required sample size per group is:",
-                                                                       style = "font-family: 'Lobster', cursive;
-                                                                       font-weight: 500; line-height: 1.1; 
-                                                                       color: #4d3a7d;"), verbatimTextOutput('resultsProp')
+                                                                    HTML("<strong><font color='#4d3a7d'> . To detect the difference between these proportions of </font></strong> "),
+                                                                    uiOutput('Pdynamic_valueDP1',inline = T),
+                                                                    HTML("<strong><font color='#4d3a7d'> with an \\(\\alpha\\) of </font></strong>"),
+                                                                    uiOutput('Pdynamic_valueALP',inline = T),
+                                                                    HTML("<strong><font color='#4d3a7d'>% and </font></strong>"),
+                                                                    uiOutput('Pdynamic_valuePOW',inline = T),
+                                                                    HTML("<strong><font color='#4d3a7d'>% power based on </font></strong>"),
+                                                            uiOutput('Pdynamic_valueTEST', inline =T),   
+                                                                    HTML("<strong><font color='#4d3a7d'>, the required sample size per group is: </font></strong>"),
+                                                                    HTML("<br/>", "<br/>"),
+                                                                    withSpinner(verbatimTextOutput('resultsProp'))
                                                             
 
                                                         ))))),    
                                                
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-                                               
+            
                                       tabPanel("Growth Curve Analysis", value = "Page7",
                                                useShinyjs(),
                                                withMathJax(),
@@ -881,51 +883,43 @@ ui <- tagList(
                                                  tabPanel("Basic information",
                                                           fluidRow(
                                                             column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                                    "In typical mice experiments, tumor cells are injected into mice and the volume of the growing tumor is measured every 2-3 days until the mouse dies or is sacrificed.
-                                                                    When the tumor reaches a certain volume, mice are randomized into treatment and control groups, and the rate of tumor growth is to be compared between groups. 
-                                                                    Often, average tumor size is compared at subjectively selected time points using a t-test or ANOVA.",
-                                                                    "<br/>","<br/>","<br/>",
-                                                                    "An alternative would be to test differences in tumor growth between groups of mice. This can be done with linear regression analysis, 
-                                                                    but taking into account the correlation of measurements within each mouse, which is vital. Therefore, the whole data from an experiment 
-                                                                    is being exploited and arbitrary selection of a time point is avoided.", 
-                                                                    "<br/>","<br/>","<br/>",
-                                                                    "To evaluate whether tumor growth differs between groups, we test the interaction term between time of volume measurement and treatment group in the model,
-                                                                    and in order to take into account that we have multiple measurements per mouse, which leads to correlated observations in the dataset,
-                                                                    we will use the <i><strong>Generalized Least Squares (GLS)</i></strong> method to estimate the parameters of the model, which can accommodate the dependence in the data.", 
-                                                                    "<br/>","<br/>","<br/>"
-                                                          ))))),
+                                                                    "In this type of experiments, tumor cells are injected into mice and the volume of the tumor is measured every 2-3 days.
+                                                                    When the tumor reaches a certain volume, e.g. \\(200mm^3\\), mice are randomized into treatment and control groups.
+                                                                    Tumor volume is regularly measured until mice die or are sacrificed. The objective is to compare the  tumor growth
+                                                                    between groups. Often, average tumor size is compared at arbitrary time points using a T-test or ANOVA.This approach is inappropriate. A proper
+                                                                    test if tumor growth rates differ between groups should be based on a linear regression which uses all measured tumor volumes for each
+                                                                    mouse and accounts for the correlation between observations from the same mouse. If the tumor volume measure does not follow a normal distribution,
+                                                                    its transformed values should be used as the outcome in a linear regression. The most common transformation applied in such studies is the logarithmic transformation.", 
+                                                                    "<br/>","<br/>","<br/>"))))),
+                                                          
                                                  tabPanel("Example", value = 'Example_growth',
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                                      "A scientist wants to test the hypothesis that a new treatment is able to suppress the tumor growth
-                                                                       compared with standard treatment. To assess that she conducts an experiment, where tumor cells are injected into mice and the volume of the growing tumor is measured every 2-3 days until 
-                                                                      the mouse dies or is sacrificed (when the tumor volume reaches 1500mm3). When tumors reach a pre-defined volume, she randomizes half of the mice to the standard treatment and the other half to the new treatment,
-                                                                      in order to compare the rate of tumor growth between groups.",
-                                                                      "<br/>","<br/>","<br/>",
-                                                                      "Data from a previous experiment is presented below.
-                                                                      The <strong>NA's</strong> denote missing values, which in this case means that a mouse is dead and does not reach the end of the experiment.
-                                                                      And as can be seen in this particular example, there are more dead mice in the control group that in the treatment one.",
+                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                                      "A scientist wants to test the hypothesis that a new treatment is able to suppress the tumor growth.  
+                                                                      An experiment is conducted where tumor cells are injected into mice and volume of the  tumor is measured every 2-3 days.
+                                                                      When tumors reach a pre-defined volume of \\(1500mm^3\\),  mice are randomized to receive either the standard treatment or the
+                                                                      new treatment. Tumor volume is measured until mice die or are sacrificed in order to compare the rate of tumor growth between 
+                                                                      treatment groups.",
+                                                                      "<br/>","<br/>",
+                                                                      "The data from an experiment are presented below. The NA denotes an unmeasured volume for mice 
+                                                                      that died or were sacrificed before the end of the study duration.",
                                                                       
                                                                       "<br/>", "<br/>","<br/>")))),
-                                                          fluidRow(
-                                                            column(8, DTOutput("ExampleGC_1",width = "80%"))),
-                                                          
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>", "<br/>","<br/>",
-                                                                      "This data can be analyzed with several software, but unfortunately not with <i>GraphPad</i>.
-                                                                      Therefore, below we provide guidelines on how it can be carried out in SPSS.",
-                                                                      "<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>",
+                                                            column(8, HTML(paste0(DTOutput("ExampleGC_1", width = "80%"),
+                                                                               "<br/>", "<br/>","<br/>"))))
+                                                          ,
+                                                          
+                                                          fluidRow(
+                                                            column(8, HTML(paste0(
+                                                                      "Such data cannot be analyzed with Graphpad software, but SPSS software can be used instead.
+                                                                      Installation of SPSS software can be requested from the IT department free of charge for NKI employees.",
+                                                                      "<br/>", "<br/>",
+                                                                      "Data in a long format should be loaded in SPSS. In such data format, each row corresponds
+                                                                       to one measurement per mouse and there are as many rows per mouse as there are volume measurements available.",
+                                                                      "<br/>", "<br/>","<br/>")))),
                                                                       
-                                                                      "First of all, the data has to be loaded in SPSS. This can be done from the menu by following the next steps:
-                                                                      <i>File -> Open -> Data</i>. Then we select the file with the data that we want to Load.",
-                                                                      "<br/>", "<br/>","<br/>",
-                                                                      "The data representation as it is above, is called <i>wide format</i>, where each row corresponds to each subject/mouse
-                                                                      and the several measurements are presented in distinct columns. However, when working with longitudinal data as in this case,
-                                                                      this format is not very convenient and thus we have to restructure it into the so-called <i>long format</i>.
-                                                                      In this kind of represantation each row corresponds to one measurement per mouse. Hence, each mouse has now as many rows as its total
-                                                                      number of measurements, instead of just one row in the wide format. Below, is a subset of the same data but in long format."
-                                                                      )))),
                                                             
                                                            fluidRow(
                                                               column(8, DTOutput("ExampleGC_2", width = "80%")))
@@ -934,254 +928,275 @@ ui <- tagList(
                                                           
                                                           fluidRow(
                                                               column(8, HTML(paste0("<br/>","<br/>","<br/>",
-                                                                    "As can be seen, we have a block of rows for each mouse, one for each day of measurement. The treatment value remains the same of course 
-                                                                    , and finally we have an new column named <strong>Volume</strong>, which is the measurement itself for each particular day. However, past experience
-                                                                    with tumor volumes showed that they are not noramlly distributed and therefore we should use a transformation for the analysis. The most common
-                                                                    is the log-transfromation, which is presented in the last column.",
+                                                                    "1. Loading data into SPSS: File -> Open -> Data",
                                                                     "<br/>", "<br/>","<br/>",
-                                                                    "There are two ways to restructure the data from wide to long format. The first is to do that directly in the data file before load it to SPSS, 
-                                                                    as we did above. The other is to do it through SPSS, but it can be complicated and it is adviseable to use the first option.",
+                                                                    "2. Creating a binary indicator variable ‘TreatmentGR’ with values 0 for control group and 1 for treatment group:",
+                                                                    "<br/>", "<br/>","<br/>",
+                                                                    "Transform -> Compute Variable -> Target Variable: TreatmentGR ; Numeric Expression : 0
+                                                                    -> If -> Include if case satisfies condition : Treatment = 'Control';", 
+                                                                    "<br/>", "<br/>","<br/>",
+                                                                    "Transform -> Compute Variable -> Target Variable: TreatmentGR ; Numeric Expression : 1
+                                                                    -> If -> Include if case satisfies condition : Treatment = 'anti-PD1'",
+                                                                    "<br/>", "<br/>","<br/>",
+                                                                    "Screenshots below show how to do it for the control group.",
                                                                     
-                                                                    "After we have loaded the data, it looks like this, where the last column is the associated dummy variable for the Treatment variable,
-                                                                    which we will use in the analysis.",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    tags$img(src = "images/GLS_Example0.PNG", width = "800px", height = "500px"),
-                                                                    
-                                                                    
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "First of all, we have to create a new variable that will be the interaction between time and treatment, which we will call <i>days_Treatment</i>.
-                                                                    This can be done by selecting <i>Transform  ->  Compute Variable</i> from the menu.",
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
+                                                                    "<br/>", "<br/>","<br/>",
                                                                     
                                                                     tags$img(src = "images/GLS_Example2.png", width = "700px", height = "300px"),
                                                                     
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
+                                                                    "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    "There, we fill in the fields as shown below and then click <i> OK </i>.",
+                                                                    tags$img(src = "images/GLS_Example20.PNG", width = "700px", height = "300px"),
                                                                     
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    tags$img(src = "images/GLS_Example3.PNG", width = "700px", height = "300px"),
+                                                                    "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
+                                                                    tags$img(src = "images/GLS_Example21.PNG", width = "700px", height = "300px"),
                                                                     
-                                                                    "Next, we select <i>Analyze -> Mixed Models -> Linear...</i> from the menu",
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    tags$img(src = "images/GLS_Example01.png", width = "700px", height = "300px"),
+                                                                    "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "Here, as can be seen below, we fill in the fields in order to build a model with <strong>Autoregressive (AR(1))</strong> pattern, and click on <i>Continue</i>.
-                                                                    If we don't fill in anything and just continue, we will get a model with an <strong> Independence </strong> correlation structure.",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    tags$img(src = "images/GLS_Example4.PNG", width = "700px", height = "300px"),
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "Next, we fill in the required fields in the following window as shown here. The next steps are the same for both models (Indepedence and AR(1)):",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    tags$img(src = "images/GLS_Example5.PNG", width = "700px", height = "300px"),
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "Then, from the buttons to the right, we select <i> Fixed... </i> and we again fill in as in the screenshot below
-                                                                    and click <i> Continue </i>:",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    tags$img(src = "images/GLS_Example7.PNG", width = "700px", height = "300px"),
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "Finally, we click on the <i> Statistics </i> button to the right and check the box of <i> Parameter estimates</i>
-                                                                    and click on <i>Continue</i>. Finally, we click on <i> OK </i> in order to run the analysis",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    tags$img(src = "images/GLS_Example6.PNG", width = "700px", height = "300px"),
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    
-                                                                    "The results are now presented in the SPSS Output file. Below first the output from the AR(1) model is given, and then 
-                                                                    from the independence one.",
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    tags$img(src = "images/GLS_Example8.PNG", width = "900px", height = "500px"),
-                                                                    
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    tags$img(src = "images/GLS_Example9.PNG", width = "900px", height = "500px"),
-                                                                    
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                                    
-                                                                    "We are mainly interested in the last two tables, namely <strong>Estimates of Fixed Effects</strong>
-                                                                    and <strong>Estimates of Covariance Parameters</strong>. In the first, we get the coefficient estimates for our covariates, which in this model
-                                                                    are the main effect of time (<i>days</i>), which denotes the slope of the tumor growth in the control group, and the interaction effect (<i>days_Treatment</i>),
-                                                                    which we are particularly interested in and denotes the difference in the slope of the tumor growth between the control and treatment groups.
-                                                                    Here, we see that the the slope of the tumor growth in the control group is 0.2261 and the interaction effect is -0.101737,
-                                                                    which means that the treatment group has a less steep tumor growth over time compared with the control group, by an amount of 0.101737. 
-                                                                    And from the <i>.Sig</i> column we see that this difference is statistically significant because its associated p-value is 0.",
+                                                                    tags$img(src = "images/GLS_Example200.PNG", width = "700px", height = "300px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>",
                                                                     
-                                                                    "In the last table, in <i>AR(1) rho</i> row, we can see how much correlation there is between measurements within mice. Here, this correlation is estimated
-                                                                    to be \\(\\rho\\) = 0.698. In the first row of the table ( <i>AR(1) diagonal</i>) we get the estimate of the residuals variance (\\(\\sigma^2\\)),
-                                                                    which here is 0.6919",
+                                                                    
+                                                                    "3. Creating a variable ‘Days_TreatmentGr’ for the interaction between time (variable 'days') and treatment (variable 'TreatmentGR'):",
+                                                                    "<br/>", "<br/>","<br/>",
+                                                                     "Transform  ->  Compute Variable -> Target Variable: Days_TreatmentGr; Numeric Expression: Days*TreatmentGr",
+                                                                    
+                                                                    "<br/>","<br/>","<br/>",
+                                                                    
+                                                                    tags$img(src = "images/GLS_Example24.png", width = "700px", height = "300px"),
+                                                                    
+                                                                    "<br/>","<br/>","<br/>","<br/>",
+                                                                    
+                                                                    tags$img(src = "images/GLS_Example23.PNG", width = "700px", height = "300px"),
+                                                                    
+                                                                    "<br/>","<br/>","<br/>",
+                                                                    
+                                                                    "4. Performing a linear regression that accounts for the correlation between observations from the same mouse:",
+                                                                    "<br/>","<br/>","<br/>",
+                                                                    
+                                                                    "Analyze -> Mixed Models -> Linear... -> Subjects: ID; Repeated: days; Repeated Covariance Type: AR(1)
+                                                                     ->  Continue -> Dependent Variable : log_volume; Covariate(s): days, Days_TreatmentGr
+                                                                     -> Fixed -> Model: days, Days_TreatmentGr using Main Effects option  -> Continue -> Statistics -> 
+                                                                    Model Statistics: Parameter estimates for fixed effects -> Continue. ",
+                                                                    "<br/>","<br/>","<br/>",
+                                                                    
+                                                                    tags$img(src = "images/GLS_Example25.png", width = "700px", height = "300px"),
+                                                                    
+                                                                  
+                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
+                                                                    
+                                                                    tags$img(src = "images/GLS_Example26.PNG", width = "700px", height = "300px"),
+                                                                  
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    "The output from the model assuming independence is exactly the same, but as can be see in the last table, there is only one row now,
-                                                                    corresponing to residuals variance (\\(\\sigma^2\\)), because here \\(\\rho\\) = 0 by definition.",
+                                                                    tags$img(src = "images/GLS_Example27.PNG", width = "700px", height = "300px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    
-                                                                    tags$img(src = "images/GLS_Example11.PNG", width = "900px", height = "500px"),
+                                                                    tags$img(src = "images/GLS_Example28.PNG", width = "700px", height = "300px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example12.PNG", width = "900px", height = "500px"),
+                                                                    tags$img(src = "images/GLS_Example29.PNG", width = "700px", height = "300px"),
                                                                     
-                                                                    "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>"
+                                                                    "<br/>","<br/>","<br/>",
                                                                     
+                                                                    "5.	Interpreting results of the analysis:",
                                                                     
+                                                                    "<br/>","<br/>","<br/>",
                                                                     
+                                                                    tags$img(src = "images/GLS_Example30.PNG", width = "900px", height = "500px"),
+                                                                   
+                                                                    "<br/>","<br/>","<br/>",
                                                                     
+                                                                    "Slope of the tumor growth in the control group = 0.226 (estimate for variable ‘days’): in the control group tumor volume on the log scale increases each day by 0.226 
+                                                                    Difference in the slope of the tumor growth between the control and treatment groups = -0.101 (estimate for variable ‘Days_TreatmentGR’): in the treatment group tumor
+                                                                    volume on the log scale increases each day by 0.124 (0.226-0.101 = 0.124)
+                                                                    Correlation between the closest two measurements within mice = 0.698 (estimate for ‘AR(1) rho’) 
+                                                                    Residual variance = 0.692 (estimate for ‘AR1 diagonal’)",
                                                                     
+                                                                    "<br/>","<br/>",
                                                                     
-
+                                                                    "6.	Performing a linear regression that does not account for the correlation between observations from the same mouse:",
+                                                                    "<br/>","<br/>","<br/>",
+                                                                    
+                                                                    "Analyze -> Mixed Models -> Linear... -> Subjects: ID; Repeated: days; Repeated Covariance Type: Scale Identity
+                                                                     ->  Continue -> Dependent Variable : log_volume; Covariate(s): days, Days_TreatmentGr
+                                                                     -> Fixed -> Model: days, Days_TreatmentGr using Main Effects option  -> Continue -> Statistics -> 
+                                                                    Model Statistics: Parameter estimates for fixed effects -> Continue. ",
+                                                                    "<br/>","<br/>","<br/>"
+                                                                    
                                                           ))))
                                                           ,
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0("Below there is a link where you can find a more thorough explanation on how to conduct <i>mixed-models analysis</i> in SPSS",
-                                                          "<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                          tags$a(href="https://stats.idre.ucla.edu/spss/seminars/spss-mixed-command/", " Mixed Models in SPSS", target = "_blank")
+                                                            column(8, HTML(paste0("More details on how to conduct <i>mixed-models analysis</i> in SPSS can be found ",
+                                                          tags$a(href="https://stats.idre.ucla.edu/spss/seminars/spss-mixed-command/", "here", target = "_blank")
                                                           
                                                           )))),
                                                           
                                                           
-                                                          HTML("<br/>","<br/>","<br/>", "<center><i><strong><font color='blue'>Power Calculation Example</font></strong></i></center>",
-                                                               "<br/>","<br/>","<br/>"),
+                                                          HTML("<br/>","<br/>","<br/>", "<i><strong><font color='blue'>Sample size calculation example</font></strong></i>",
+                                                               "<br/>"),
                                                           
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                            column(8, HTML(paste0("<br/>",
                                                                                   
-                                                           "In order to do a sample size calculation for this kind of experiment, we will make use of simple linear regression. More precisely, 
-                                                            we will compute the required sample size based on simple linear regression, and then we will adjust it for the longitudinal analysis,
-                                                           by multiplying the resulted sample size by a factor called <strong>Design Effect</strong>.",
-                                                           "First of all, we need the minimum effect that we wish to detect, which in this case is the difference in slope of tumor growth
-                                                           between the treatment groups (the interaction between time and treatment as explained above). Further, we need an estimate of the variance of the residuals (\\(\\sigma^2\\)).",
-                                                           "Then for the Design effect, we we will need the <i>standard error</i> of the interaction estimate, produced by the two models described above,
-                                                           namely the simple linear regression and the model with AR(1) correlation pattern. These values can be found from the table <i> Estimates of the Fixed Effects</i>,
-                                                           in the models output. For instance, for the AR(1) model, it is estimated to be 0.0249 :",
+                                                           "The sample size required for this kind of experiment is computed from the sample size required for a simple linear regression  multiplied 
+                                                           by a factor called <strong>design effect</strong>. This factor corrects for the correlation between measurements from the same mouse. The design effect
+                                                           is defined as the ratio between the variance of the interaction term from a linear model that accounts for correlated measurements and
+                                                           the variance of the interaction term from a linear model that does not account for correlated measurements.",
+                                                           
+                                                           "<br/>","<br/>",
                                                            
                                                            
-                                                           
-                                                           "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                           
-                                                           tags$img(src = "images/GLS_Example10.PNG", width = "900px", height = "500px"),
-                                                           
-                                                           "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
-                                                           
-                                                           
-                                                            "Moreover, we need to specify the number of measurements that we are going to take for each mouse. Here we assume that the two treatment groups
-                                                            are expected to have more or less the same follow-up time, and the drop-out will not be severe. In case that one of the groups is the control,
-                                                            or in general severe dropout is expected in one of the groups, then the number of measurements should be 
-                                                            defined based on that group. Along with that, we need to define also the
-                                                            distance between two measurements. In mice experiments, the measurements are usually taken every Monday-Wednesday-Friday, and in this case
-                                                            we take the distance to be 2 days.
-                                                            Finally, the power level and the significance level  \\(\\alpha\\) of a test, or in other words, the desired Type-I error,
-                                                            need to be specified. Usually, power is set to 80% and \\(\\alpha\\) to 5%")))),
+                                                            "Calculations of the required sample size can be performed under the Sample Size Calculation tab.
+                                                             For illustration, we will use the example described above. As was already mentioned, this analysis should be 
+                                                             done using the logarithmic transformation of the tumor volume as the response.
+                                                             For that reason the sample size calculation should be done using values on this scale and not the raw ones. Further, 
+                                                             the number of measurements that will be used for this calculation should be realistic. It should reflect the number
+                                                             of measurements that is expected to be taken for each mouse. If many mice do not reach that number because of early death or
+                                                             sacrifice, then the sample size calculation would not be correct anymore.")))),
+                                                     
                                                           
-                                                         
-                                                          
-                                                          fluidRow(
-                                                            column(8, HTML(paste0("<br/>", "<br/>","<br/>",
-                                                               "This is an example of how this app can be used in order to perform sample size calculations. 
-                                                               The image below is from the next tab where the actual sample size calculation can be done. In this interactive panel the required input can provided,
-                                                               and the results will appear.",
-                                                               
-                                                               "<br/>", "<br/>","<br/>",
-                                                               
-                                                               tags$img(src = "images/PowerExample_GCA1.PNG", width = "350px", height = "500px"),
-                                                               
-                                                             "<br/>", "<br/>","<br/>", 
-                                                               "We show the calculation of the required sample size for the previous example")))),
-                                                          
-                                                          HTML("<br/>", "<br/>","<br/>",
-                                                               "For this particular example, we have:",
+                                                          HTML("<br/>", "<br/>",
                                                                "<ol>
-                                                                   <li>Effect of interest (difference in slopes) = -0.101 (The minus sign here means that the treatment group has a less steep tumor growth)</li>
-                                                                   <li>Variance of the residuals = 0.6919 </li>
-                                                                   <li>Standard error of the interaction effect - Simple model = 0.0148 </li>
-                                                                   <li>Standard error of the interaction effect - AR(1) model = 0.0249 </li>
+                                                                   <li>Difference in tumor growth rates   = -0.101 </li>
+                                                                   <li>Variance of the residuals from the model that does not account for correlation = 0.636 </li>
+                                                                   <li>Standard error of the interaction effect from the model that does not account for correlation   = 0.0148 </li>
+                                                                   <li>Standard error of the interaction effect from the model that accounts for correlation  = 0.0249 </li>
                                                                    <li>Average number of measurements per mouse = 8 </li>
-                                                                   <li>Time difference between measurements = 2 </li>
-                                                                   </ol>")
+                                                                   <li>Time difference between two measurements = 2 </li>
+                                                                   </ol>",
+                                                               "<br/>"),
+                                                          
+                                                          
+                                                          HTML(paste0("The number of measurements used for the calculation is the expected number of observations per mouse.",
+                                                                      "<br/>", "<br/>",
+                                                                      "Required number of mice for growth curve data is obtained by estimating required number of observations for a model that does 
+                                                                       not account for correlated measurements. Then the estimate is multiplied by a design factor (= variance of the interaction effect
+                                                                       from the model that accounts for correlation / variance of the interaction effect from the model that does not account for correlation) 
+                                                                       and divided by the expected number of observations per mouse.",
+                                                                      "<br/>", "<br/>"))
+                                                                      
                                                                
                                                           ,
+                                                          tags$img(src = "images/PowerExample_GCA3.PNG", width = "500px", height = "900px"),
                                                           
-                                                          HTML("<br/>", "<br/>","<br/>",
-                                                               "If we now provide the input to the panel at the left, results will show up, as in the image below.",
-                                                               "<br/>", "<br/>","<br/>"),
-                                                          
-                                                          tags$img(src = "images/PowerExample_GCA2.PNG", width = "700px", height = "300px"),
+                                                          tags$img(src = "images/PowerExample_GCA5.png", width = "800px", height = "300px"),
                                                           HTML("<br/>", "<br/>","<br/>","<br/>", "<br/>","<br/>")
                                                           
                                                  ),
                                                  
-                                                 tabPanel("Power Calculation",
+                                                 tabPanel("Sample Size Calculation",
                                                           sidebarLayout(
                                                             sidebarPanel(
-                                                              numericInput( "Effect", "Interaction effect", -0.101 ),
-                                                              numericInput( "VARres", "Variance of residuals", 0.6919 ),
-                                                              numericInput( "SE_LR", "Standard error of the interaction effect - Simple model", 0.0148 ),
-                                                              numericInput( "SE_AR", "Standard error of the interaction effect - AR(1) model", 0.0249 ),
-                                                              numericInput( "NoMeasurements", "Average number of measurements per mouse", 8 ),
-                                                              numericInput( "Space", "Time difference between measurements", 2 ),
+                                                              numericInput( "Effect", "Difference in tumor growth rates", -0.101, step = 0.001 ),
+                                                              numericInput( "VARres", "Variance of the residuals", min = 0, 0.636, step = 0.001 ),
+                                                              numericInput( "SE_LR", "Standard error of the interaction effect - Simple model", min = 0, 0.0148, step = 0.001 ),
+                                                              numericInput( "SE_AR", "Standard error of the interaction effect - AR(1) model", min = 0, 0.0249, step = 0.001 ),
+                                                              numericInput( "NoMeasurements", "Average number of measurements per mouse", min = 1, 8, step = 1 ),
+                                                              numericInput( "Space", "Time difference between measurements", 2, min = 1, step = 1),
                                                               sliderInput( "PowerInputLR", "Power", min = 0, max = 100, value = 80, step = 1),
-                                                              sliderInput( "errorInputLR", "Type I error", min = 0, max = 10, value = 5, step = 1)
+                                                              sliderInput( "errorInputLR", "Type I error", min = 0, max = 10, value = 5, step = 0.1)
                                                               
                                                             ),
                                                             
-                                                            mainPanel(
+                                                            mainPanel(HTML(paste0("<br/>","<br/>", "Information on how to use this online calculator is provided in the ",
+                                                                         tags$a("Example", onclick = "customHref('Page7');customHref('Example_growth');"))),
+                                                                         
                                                               HTML("<br/>", "<br/>","<br/>", 
-                                                                   "<strong><font color='#4d3a7d'>In order to achieve</font></strong>"),
-                                                              uiOutput('dynamic_valuePOWLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'>% power at a </font></strong> "),
-                                                              uiOutput('dynamic_valueALLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'>% significance level to detect a difference in slope between the two treatment groups of</font></strong> "),
-                                                              uiOutput('dynamic_valueEffLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> , where the variance of the residuals is </font></strong>"),
-                                                              uiOutput('dynamic_valueVARresLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> , and the average total number of measurements per mouse is </font></strong>"),
+                                                                   "<strong><font color='#4d3a7d'>The average number of measurements per mouse is </font></strong>"),
                                                               uiOutput('dynamic_MeasurementsLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> , measured every </font></strong>"),
+                                                              HTML("<strong><font color='#4d3a7d'> and measurements are obtained approximately every </font></strong> "),
                                                               uiOutput('dynamic_DistaLR',inline = T),
-                                                              HTML("<strong><font color='#4d3a7d'> days </font></strong>"),
-                                                              HTML("<br/>", "<br/>","<br/>"),
-                                                              
-                                                              h4("The required sample size per group is:",
-                                                                 style = "font-family: 'Lobster', cursive;
-                                                                 font-weight: 500; line-height: 1.1; 
-                                                                 color: #4d3a7d;"), verbatimTextOutput('resultsLR'),
+                                                              HTML("<strong><font color='#4d3a7d'> time units. Standard errors of the interaction effect obtained with a linear regression that does and does not account for the correlated measurements are </font></strong> "),
+                                                              uiOutput('dynamic_valueSDX2LR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'>  and  </font></strong>"),
+                                                              uiOutput('dynamic_valueSDX1LR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> , respectively. The ratio is the design effect, i.e., </font></strong>"),
+                                                              uiOutput('dynamic_valueDE',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> . To detect a difference in growth rates of </font></strong>"),
+                                                              uiOutput('dynamic_valueEffLR',inline = T),
+                                                              HTML("<strong><font color='#4d3a7d'> with an \\(\\alpha\\) of </font></strong>"),
+                                                              uiOutput('dynamic_valueALLR',inline = T),                                               
+                                                              HTML("<strong><font color='#4d3a7d'>% and </font></strong>"),
+                                                              uiOutput('dynamic_valuePOWLR',inline = T),                                                             
+                                                              HTML("<strong><font color='#4d3a7d'>% power, the required sample size per group is: </font></strong>",
+                                                                   "<br/>", "<br/>","<br/>"),
+
+                                                              verbatimTextOutput('resultsLR'),
                                                               
                                                               br(), br()
                                                               #plotOutput("Survcoolplot33")
                                                               ))
                                                           
                                                           
-                                                 ))), inverse = T, collapsible = T
+                                                 )   # TabPanel
+                                                 
+                                                 
+                                              #   tabPanel("Analysis", value = "AnalysisGCA",
+                                                          
+                                                  #       radioButtons(
+                                                 #           "fileType_Input",
+                                                #            label = h4("Choose File type"),
+                                               #             choices = list(".csv/txt" = 1, ".xlsx" = 2),
+                                              #              selected = 1,
+                                             #               inline = TRUE
+                                            #              ),
+                                                          
+                                                        #  fileInput(
+                                                       #     'file1',
+                                                      #      h4('Upload Itemns List'),
+                                                     #       accept = c(
+                                                    #          'text/csv',
+                                                         #     'text/comma-seperated-values,text/plain',
+                                                        #      '.csv',
+                                                       #       '.xlsx')
+                                                      #    ),
+                                                            
+                                                     #     DT::dataTableOutput("sample_table"),
+                                                          
+                                                    #      HTML("<br/>", "<br/>", "<br/>",
+                                                   #            "Analysis-Results",
+                                                  #             "<br/>", "<br/>", "<br/>",
+                                                 #              "Output of the model with Independence structure",
+                                                #               "<br/>", "<br/>"),
+                                                          
+                                                          # These results are with an arbitrary reference level....
+                                                          
+                                                        #  verbatimTextOutput('resultsGC2'),
+                                                       #   
+                                                      #    HTML("<br/>", "<br/>", 
+                                                     #          "Output of the model with AR(1) structure",
+                                                    #           "<br/>", "<br/>"),
+                                                   #       
+                                                  #        verbatimTextOutput('resultsGC_AR2'),
+                                                 #
+                                                      #    HTML("<br/>", "<br/>", 
+                                                     #          "The correlation between measurements that are 1 day apart is: "),
+                                                    #           
+                                                   #       textOutput('resultsGC_AR2_COR', inline = T),
+                                                  #        
+                                                 #         
+                                                #          HTML("<br/>", "<br/>",
+                                               #                "Below are presented the necessary values for doing a sample size calculation.",
+                                              #                 "<br/>", "<br/>", "<br/>", "<br/>")
+                                                          
+                                                          
+                                                    #  ) # TabPanel
+                                                 
+                                                 
+                                                 )), inverse = T, collapsible = T
                            
-                                               )))
+                                               ))
+  
+
+
+)
   
 

@@ -191,16 +191,16 @@ server <- function(input, output){
   
   output$Example_1 <- renderDT(matrix(c(1:10, 288.67, 286.39, 295.82, 282.82, 264.21, 265.69, 266.26, 291.32, 260.67, 253.03,
                                                                   rep("Control", 5), rep("Treatment", 5)), ncol = 3),
-                                                         colnames = c("ID", "HDL-level", "Group"),
+                                                         colnames = c("ID", "HDL level", "Group"),
                                                          selection = 'none',
                                                          options = list(lengthMenu = c(5, 5, 5), pageLength = 10,
                                                                         dom = 't',lengthChange = FALSE))
   
   
-  output$Example_2 <- renderDT(matrix(c(1:15, 288.67, 286.39, 295.82, 282.82,264.21,265.69, 266.26, 291.32, 260.67, 253.03,
-                                                                  257.50, 240.63, 263.98, 264.81, 255.51,
-                                                                  rep("Control", 5), rep("Treatment A", 5), rep("Treatment B", 5)), ncol = 3),
-                                                         colnames = c("ID", "HDL-level", "Group"),
+  output$Example_2 <- renderDT(matrix(c(1:15, 265.69, 266.26, 291.32, 260.67, 253.03,
+                                                                  257.50, 240.63, 263.98, 264.81, 255.51, 288.67, 286.39, 295.82, 282.82,264.21,
+                                                                  rep("Treatment A", 5), rep("Treatment B", 5), rep("Control", 5)), ncol = 3),
+                                                         colnames = c("ID", "HDL level", "Group"),
                                                          selection = 'none',
                                                          options = list(lengthMenu = c(5, 5, 5), pageLength = 15,
                                                                         dom = 't', lengthChange = FALSE))
@@ -306,9 +306,18 @@ server <- function(input, output){
     cat(input$error3Input)})
   
   
+  
   output$dynamic_valueD2 <- renderPrint({
     cat(input$meanAAA2Input - input$meanBBB2Input)})
   
+  
+  output$dynamic_valueM1 <- renderPrint({
+    cat(input$meanAAA2Input)})
+  
+  
+  
+  output$dynamic_valueM2 <- renderPrint({
+    cat(input$meanBBB2Input)})
   
   output$dynamic_valueSDA2 <- renderPrint({
     cat(input$SDAAA2Input)})
@@ -422,10 +431,10 @@ output$ExampleSurv <- renderUI({
 })
 
 
-output$Surv_Example_1 <- renderDT(matrix(c(1:20, 15,16,23,23,23,28,30,32,32,35,14,14,28,28,32,35,35,38,46,58,
+output$Surv_Example_1 <- renderDT(matrix(c(1:20, 10,11,17,17,18,21,19,32,32,35,19,20,28,30,34,41,40,41,46,58,
                                                                      rep(1,10), 0,0, rep(1,7), 0,
                                                                      rep("Vehicle", 10), rep("Treatment", 10)), ncol = 4),
-                                                       colnames = c("ID","Days", "Status", "Group"),
+                                                       colnames = c("ID","Survival time (days)", "Outcome", "Group"),
                                                        selection = 'none',
                                                        options = list(lengthMenu = c(5, 5, 5), pageLength = 20,
                                                                       dom = 't'))
@@ -436,7 +445,7 @@ output$Surv_Example_1 <- renderDT(matrix(c(1:20, 15,16,23,23,23,28,30,32,32,35,1
 
 output$Surv_Example_2 <- renderPrint({
   
-  mydataSurv <- data.frame(Days = c(15,16,23,23,23,28,30,32,32,35,14,14,28,28,32,35,35,38,46,58),
+  mydataSurv <- data.frame(Days = c(10,11,17,17,18,21,19,32,32,35,19,20,28,30,34,41,40,41,46,58),
     Status = c(rep(1,10), 0,0, rep(1,7), 0),
     Group = c(rep("Vehicle", 10), rep("Treatment", 10)))
   survdiff(Surv(Days, Status) ~ Group, data = mydataSurv)
@@ -506,7 +515,7 @@ output$sdynamic_valueA <- renderPrint({
 
 
 output$sdynamic_valueHR <- renderPrint({
-  cat(input$MedB1Input/input$MedA1Input)})
+  cat(round(input$MedB1Input/input$MedA1Input, digits = 2))})
 
 output$sdynamic_valueFT <- renderPrint({
   cat(input$FT1Input)})
@@ -521,15 +530,85 @@ output$sdynamic_valueAlp <- renderPrint({
 
 # Proportions 
 
+powr <- eventReactive(input$buttonPrInput,{ 
+  withBusyIndicatorServer("buttonPrInput", {
 
-samsiz <- reactive({
+  prop1 = input$Prop1Input
+  prop2 = input$Prop2Input
+    
+  if(abs(prop1 - prop2) < 0.2 | isTRUE(all.equal(abs(prop1-prop2), 0.2))){
+    SS <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+                                   sig.level = input$error1InputP/100)$n)
+    
+
+  }else if(abs(prop1 - prop2) < 0.3 | isTRUE(all.equal(abs(prop1-prop2), 0.3))){
+  
+    
+    if((prop1 > 0.4 & prop1 < 0.6) | (prop2 > 0.4 & prop2 < 0.6)){
+      
+      nn <- seq(50, 130)
+      
+    }else{
+      
+      nn <- seq(30, 80)
+      
+    }
+    
+    res <- mapply(FUN = power.fisher.test,
+                  MoreArgs = list(p1 = prop1, p2 = prop2,
+                                  alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+    SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+    
+  }else{
+    nn <- seq(5, 65)
+    res <- mapply(FUN = power.fisher.test,
+                  MoreArgs = list(p1 = prop1, p2 = prop2,
+                                  alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+    SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+  
+    }  
+
+  
+  list(nn=nn, SS=SS)
+  
+    })
+})
+
+
+#nn <- seq(4, 150)
+#powe <- eventReactive(input$buttonPrInput,{ 
+#  withBusyIndicatorServer("buttonPrInput", {
+#  mapply(FUN = power.fisher.test,
+#               MoreArgs = list(p1 = input$Prop1Input, p2 = input$Prop2Input,
+#                                alpha = input$error1InputP/100, nsim = 800), nn, nn)
+#  })
+#})
+
+sample_sizPr <- eventReactive(
+  input$buttonPrInput,{
+    withBusyIndicatorServer("buttonPrInput", {
+      
+      powr()$nn[which(powr()$res == min(powr()$res[powr()$res >= (input$Power1InputP)/100]))]
+      
+      })
+  })
+
+output$resultsProp <- renderPrint({
+  if(input$buttonPrInput){
+    isolate({powr()$SS})
+  }
+})
+
+
+
+kksamsiz <- reactive({
   
   ceiling(power.prop.test(p1 = input$Prop1Input, p2 = input$Prop2Input, power = input$Power1InputP/100, sig.level = input$error1InputP/100)$n)
   
   
 })
   
-output$resultsProp <- renderPrint({samsiz()})
+output$kkresultsProp <- renderPrint({samsiz()})
 
 
 
@@ -552,6 +631,15 @@ output$Pdynamic_valuePOW <- renderPrint({
   cat(input$Power1InputP)})
 
 
+output$Pdynamic_valueTEST <- reactive({
+  if((abs(input$Prop1Input - input$Prop2Input) < 0.2 | isTRUE(all.equal(abs(input$Prop1Input - input$Prop2Input), 0.2)))){
+    HTML("<strong><font color='#4d3a7d'> Z-test for proportions </font></strong>")
+    }else{
+    HTML("<strong><font color='#4d3a7d'> Fisher's exact test </font></strong>")
+  }
+})
+
+
 
 MydataP <- readRDS("WWW/data/Example_Prop")
 output$ExamplePrp_1 <- renderDT(MydataP,
@@ -559,21 +647,34 @@ output$ExamplePrp_1 <- renderDT(MydataP,
                                options = list(lengthMenu = c(5, 5, 5), pageLength = 10,  
                                               lengthChange = FALSE, dom = 't'), server = FALSE)
 
+output$ExamplePrp_11 <- renderDT(matrix(c(1:20, 
+                                rep("Control", 10), rep("Treatment", 10),
+                                0, 1, rep(0, 8), 1, 0, 0, 1, rep(0, 4), 1, 0), ncol = 3),
+                            colnames = c("ID", "Group", "Response"),
+                            selection = 'none',
+                            options = list(lengthMenu = c(2, 2, 2), pageLength = 20,
+                                           dom = 't'))
+
+
 
 # Growth Curve 
 
 options(htmlwidgets.TOJSON_ARGS = list(na = 'string'))
 
-Mydata <- readRDS("WWW/data/RubenWide")
+Mydata_1 <- readRDS("WWW/data/RubenWide2")
+
+Mydata <- Mydata_1 %>% mutate_if(is.numeric, ceiling)
+
 output$ExampleGC_1 <- renderDT(Mydata,
                                selection = 'none',  rownames = FALSE,
                                options = list(lengthMenu = c(5, 5, 5), pageLength = 10,  
                                               lengthChange = FALSE, dom = 't'), server = FALSE)
 
 
-Mydata2 <- readRDS("WWW/data/RubenLong")
+Mydata2 <- readRDS("WWW/data/RubenLong2")
 
-Mydata2 <- Mydata2 %>% mutate_if(is.numeric, round, 3)
+Mydata2 <- Mydata2 %>% mutate_if(str_detect(colnames(.), fixed("Volume")), ceiling)  %>%
+                       mutate_if(is.numeric, round, 2)
 
 output$ExampleGC_2 <- renderDT(Mydata2,
                                selection = 'none',  rownames = FALSE,
@@ -583,7 +684,7 @@ output$ExampleGC_2 <- renderDT(Mydata2,
 # Power Calculation
 
 
-SDX <- reactive({sd(seq(0, input$NoMeasurements, by = input$Space))})
+SDX <- reactive({sd(seq(0, 2*input$NoMeasurements - input$Space, by = input$Space))})
 
 
 sample_sizeLR <- reactive({
@@ -593,6 +694,13 @@ sample_sizeLR <- reactive({
   
 })
 
+#SDX <- sd(seq(0, NoMeasurements, by = Space))
+#Sigma <- (VARres) * (1/(SDX^2) + 1/(SDX^2))
+#SS <- ((qnorm((alp)/2, lower.tail = F) + qnorm((pow)))^2 * Sigma)/((Effect)^2)
+
+#DE <- (SE_AR^2)/(SE_LR^2)
+
+#resultsLR <- ceiling(DE*SS/(NoMeasurements))
 
 
 #Power_LR <- reactive({ # Getting Rho
@@ -636,10 +744,13 @@ output$dynamic_valueEffLR <- renderPrint({
 
 
 output$dynamic_valueSDX1LR <- renderPrint({
-  cat(input$SDX1)})
+  cat(input$SE_LR)})
 
 output$dynamic_valueSDX2LR <- renderPrint({
-  cat(input$SDX2)})
+  cat(input$SE_AR)})
+
+output$dynamic_valueDE <- renderPrint({
+  cat(round(DE(), digits = 2))})
 
 output$dynamic_valueVARresLR <- renderPrint({
   cat(input$VARres)})
@@ -661,5 +772,78 @@ output$dynamic_valuePOWLR <- renderPrint({
 
 
 
+
+
+########################################## Not relevant for now......  #######################
+
+# Analysis
+
+df_products_upload <- reactive({
+  
+  inFile <- input$file1
+  
+  if(is.null(inFile)){
+    return(NULL)}
+  
+  if(input$fileType_Input == '2'){
+    read.xlsx(inFile$datapath,
+              header= TRUE,
+              sheetIndex = 1,
+              stringsAsFactors = FALSE)
+  }else{
+    read.csv(inFile$datapath,
+             header= TRUE,
+             stringsAsFactors = FALSE)
+  }
+  
+})
+
+df_products_upload2 <- reactive({
+  
+Datas <- df_products_upload() %>% mutate_if(str_detect(colnames(.), fixed("Volume")), ceiling)  %>%
+  mutate_if(is.numeric, round, 2)
+
+})
+
+
+output$sample_table <- DT::renderDataTable({
+  
+  df <- df_products_upload2()
+  DT::datatable(df)
+  
+})
+
+
+# With Ind structure
+
+resultsGC_Ind <- reactive({
+  
+  gls(log_volume ~ dag + dag:treatment
+      , method = "REML"
+      , correlation = NULL
+      , data = df_products_upload2())
+  
+})
+
+  
+output$resultsGC2 <- renderPrint({coef(summary(resultsGC_Ind()))})
+
+
+# With AR(1)
+resultsGC_AR <- reactive({
+  
+  gls(log_volume ~ dag + dag:treatment
+      , method = "REML"
+      , correlation = corCAR1(form = ~dag|mouse)
+      , data = df_products_upload2())
+  
+})
+
+
+output$resultsGC_AR2 <- renderPrint({coef(summary(resultsGC_AR()))})
+
+output$resultsGC_AR2_COR <- renderPrint({
+                              as.numeric(coef(resultsGC_AR()$model$corStr, unconstrained = FALSE))
+  })
 
 } ### END
