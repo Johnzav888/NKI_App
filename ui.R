@@ -836,7 +836,7 @@ ui <- tagList(
                                                
                                                tags$img(src = "images/PowerExample_PROP1.PNG", width = "350px", height = "500px"),
                                                HTML("<br/>", "<br/>"),
-                                               tags$img(src = "images/PowerExample_PROP6.png", width = "900px", height = "300px")
+                                               tags$img(src = "images/PowerExample_PROP6.PNG", width = "900px", height = "300px")
 
                                                ),
                                                
