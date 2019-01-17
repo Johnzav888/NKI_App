@@ -873,7 +873,7 @@ ui <- tagList(
                                                             uiOutput('Pdynamic_valueTEST', inline =T),   
                                                                     HTML("<strong><font color='#4d3a7d'>, the required sample size per group is: </font></strong>"),
                                                                     HTML("<br/>", "<br/>"),
-                                                                    withSpinner(verbatimTextOutput('resultsProp')), withSpinner(verbatimTextOutput('resultsProp2'))
+                                                                    withSpinner(verbatimTextOutput('resultsProp'))
                                                             
 
                                                         ))))),    

@@ -542,7 +542,7 @@ powr <- eventReactive(input$buttonPrInput,{
       
       result <- power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
                                     sig.level = input$error1InputP/100)$n
-      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      #ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
       
       
     }else{
@@ -551,13 +551,13 @@ powr <- eventReactive(input$buttonPrInput,{
         
         
         nn <- seq(22, 100)
-        ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+        #ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
         
       }else{
         
         
         nn <- seq(8, 45)
-        ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+        #ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
         
       }
       
@@ -567,7 +567,7 @@ powr <- eventReactive(input$buttonPrInput,{
       
       
       result <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
-      ss2 <- ss1
+      #ss2 <- ss1
       
     }
     
@@ -577,13 +577,13 @@ powr <- eventReactive(input$buttonPrInput,{
       
       result <- power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
                                     sig.level = input$error1InputP/100)$n
-      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      #ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
       
       
     }else{
       
       nn <- seq(5, 60)
-      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      #ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
       
       res <- mapply(FUN = power.fisher.test,
                     MoreArgs = list(p1 = prop1, p2 = prop2,
@@ -595,7 +595,7 @@ powr <- eventReactive(input$buttonPrInput,{
     }
   }
   
-  list(SS=result, ss=ss2)
+  list(SS=result)
   
     
   
