@@ -536,40 +536,109 @@ powr <- eventReactive(input$buttonPrInput,{
   prop1 = input$Prop1Input
   prop2 = input$Prop2Input
     
-  if(abs(prop1 - prop2) < 0.2 | isTRUE(all.equal(abs(prop1-prop2), 0.2))){
-    SS <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
-                                   sig.level = input$error1InputP/100)$n)
+  if((prop1 > 0.4 & prop1 < 0.6) | (prop2 > 0.4 & prop2 < 0.6)){
     
-
-  }else if(abs(prop1 - prop2) < 0.3 | isTRUE(all.equal(abs(prop1-prop2), 0.3))){
-  
-    
-    if((prop1 > 0.4 & prop1 < 0.6) | (prop2 > 0.4 & prop2 < 0.6)){
+    if(abs(prop1 - prop2) < 0.3 | isTRUE(all.equal(abs(prop1-prop2), 0.3))){
       
-      nn <- seq(50, 130)
+      result <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+                                    sig.level = input$error1InputP/100)$n)
+      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      
       
     }else{
       
-      nn <- seq(30, 80)
+      if(abs(prop1 - prop2) < 0.45 | isTRUE(all.equal(abs(prop1-prop2), 0.45))){
+        
+        
+        nn <- seq(22, 100)
+        ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+        
+      }else{
+        
+        
+        nn <- seq(8, 45)
+        ss1 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+        
+      }
+      
+      res <- mapply(FUN = power.fisher.test,
+                    MoreArgs = list(p1 = prop1, p2 = prop2,
+                                    alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+      
+      
+      result <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+      ss2 <- ss1
       
     }
     
-    res <- mapply(FUN = power.fisher.test,
-                  MoreArgs = list(p1 = prop1, p2 = prop2,
-                                  alpha = input$error1InputP/100, nsim = 1000), nn, nn)
-    SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
-    
   }else{
-    nn <- seq(5, 65)
-    res <- mapply(FUN = power.fisher.test,
-                  MoreArgs = list(p1 = prop1, p2 = prop2,
-                                  alpha = input$error1InputP/100, nsim = 1000), nn, nn)
-    SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+    
+    if(abs(prop1 - prop2) < 0.25 | isTRUE(all.equal(abs(prop1-prop2), 0.25))){
+      
+      result <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+                                    sig.level = input$error1InputP/100)$n)
+      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      
+      
+    }else{
+      
+      nn <- seq(5, 60)
+      ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
+      
+      res <- mapply(FUN = power.fisher.test,
+                    MoreArgs = list(p1 = prop1, p2 = prop2,
+                                    alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+      
+      result <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+      
+      
+    }
+  }
   
-    }  
+  list(SS=result, ss=ss2)
+  
+    
+  
+#  if(abs(prop1 - prop2) < 0.2 | isTRUE(all.equal(abs(prop1-prop2), 0.2))){
+#    SS <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+#                                   sig.level = input$error1InputP/100)$n)
+#    ss2 <- 10
+
+  #}else if(abs(prop1 - prop2) < 0.3 | isTRUE(all.equal(abs(prop1-prop2), 0.3))){
+  
+    
+   # if((prop1 > 0.4 & prop1 < 0.6) | (prop2 > 0.4 & prop2 < 0.6)){
+      
+    #  nn <- seq(40, 130)
+     # ss1 <- 11
+    
+#      }else if((prop1 > 0.4 & prop1 < 0.6) | (prop2 > 0.4 & prop2 < 0.6)){
+      
+ #     nn <- seq(40, 130)
+  #    ss1 <- 11
+       
+   # }else{
+      
+    #  nn <- seq(30, 80)
+     # ss1 <- 12
+    #}
+    
+#    res <- mapply(FUN = power.fisher.test,
+ #                 MoreArgs = list(p1 = prop1, p2 = prop2,
+  #                                alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+   # SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+  #  ss2 <- ss1
+  #}else{
+   # nn <- seq(5, 65)
+  #  res <- mapply(FUN = power.fisher.test,
+   #               MoreArgs = list(p1 = prop1, p2 = prop2,
+    #                              alpha = input$error1InputP/100, nsim = 1000), nn, nn)
+    #SS <- nn[which(res == min(res[res >= (input$Power1InputP)/100]))]
+    #ss2 <- 14
+    #}  
 
   
-  list(nn=nn, SS=SS)
+  #list(SS=SS, ss = ss2)
   
     })
 })
@@ -584,14 +653,14 @@ powr <- eventReactive(input$buttonPrInput,{
 #  })
 #})
 
-sample_sizPr <- eventReactive(
-  input$buttonPrInput,{
-    withBusyIndicatorServer("buttonPrInput", {
+#sample_sizPr <- eventReactive(
+#  input$buttonPrInput,{
+#    withBusyIndicatorServer("buttonPrInput", {
       
-      powr()$nn[which(powr()$res == min(powr()$res[powr()$res >= (input$Power1InputP)/100]))]
+#      powr()$nn[which(powr()$res == min(powr()$res[powr()$res >= (input$Power1InputP)/100]))]
       
-      })
-  })
+#      })
+#  })
 
 output$resultsProp <- renderPrint({
   if(input$buttonPrInput){
@@ -599,6 +668,11 @@ output$resultsProp <- renderPrint({
   }
 })
 
+output$resultsProp2 <- renderPrint({
+  if(input$buttonPrInput){
+    isolate({powr()$ss})
+  }
+})
 
 
 kksamsiz <- reactive({

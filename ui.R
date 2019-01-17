@@ -29,6 +29,7 @@ library(stringr)
 library(xlsx)
 library(nlme)
 library(statmod)
+library(rlang)
 
 #library(shiny.router)
 
@@ -44,7 +45,7 @@ source("Helpers.R")
 ui <- tagList(
   tags$head(
     tags$script("src"="app.js")
-  ), fluidPage(navbarPage(theme=shinytheme("spacelab"), title = div(img(src = "images/logo-AVL.jpg", height = "40px", width = "120px"
+  ), fluidPage(navbarPage(theme=shinytheme("spacelab"), title = div(img(src = "images/logo-AVL2.jpg", height = "55px", width = "150px"
                                                                         ))#, h4("NKI_statistics", 
                                                                          #style = "font-family: 'Lobster', cursive;
                                                                         #font-weight: 500; line-height: 1.1; 
@@ -53,8 +54,10 @@ ui <- tagList(
                            tabPanel("Design and statistical analysis of mice experiments", value = "StartPage",
                                     
                                     fluidRow(
-                                      column(8, HTML(paste0("<br/>",
-                                                    "This website supports researchers conducting mice experiments at the Netherlands Cancer Institute
+                                      column(10, HTML(paste0("<br/>",
+                                                    "This website is provided by the NKI Biostatistics Center ",
+                                                    tags$a("(here) ", href = "https://www.nki.nl/topmenu/biostatistics-center/", target = "_blank"), 
+                                                    "and supports researchers conducting mice experiments at the Netherlands Cancer Institute
                                                     in the statistical aspects of the studies. It provides explanations of basic statistical concepts and tests.
                                                     Moreover, researchers can use this app to calculate the required sample size when an experiment is being designed.
                                                     The latter is vital and must be performed, because :",
@@ -74,13 +77,13 @@ ui <- tagList(
                                       ,
                                       
                                     fluidRow(
-                                      column(8, HTML(paste0("<br/>", "<br/>",
+                                      column(10, HTML(paste0("<br/>", "<br/>",
                                       "Sample size calculation depends on the type of experiment. In  most of the mouse experiments conducted in the Netherlands Cancer Institute,  
                                       groups of mice are compared with respect to mean/median values, survival outcomes, proportions and tumor growth. 
                                       Examples of such experiments are listed below and more information can be found under the specific tabs.")))),
                           
                                     fluidRow(
-                                      column(8, HTML(paste0("<br/>", "<br/>",
+                                      column(10, HTML(paste0("<br/>", "<br/>",
                                       "<i><strong><font color='red'> Comparison of means/medians</font></strong></i>",
                                       "<br/>", "<br/>",
                                       "<i>Example:</i> : A scientist wants to test the hypothesis that a novel compound is superior in reducing high-density lipoprotein (HDL)
@@ -93,7 +96,7 @@ ui <- tagList(
                           
                           
                           fluidRow(
-                            column(8, HTML(paste0("<br/>", "<br/>",
+                            column(10, HTML(paste0("<br/>", "<br/>",
                                "<i><strong><font color='red'> Survival Analysis </font></strong></i>",
                                "<br/>", "<br/>",
                                "<i>Example:</i> To evaluate whether the chemotherapeutic agent  paclitaxel improves survival after esophageal adenocarcinoma (EAC), 
@@ -105,7 +108,7 @@ ui <- tagList(
                        tags$a("Go to Survival Analysis", onclick = "customHref('Page5');"),
                     
                        fluidRow(
-                         column(8, HTML(paste0("<br/>", "<br/>",
+                         column(10, HTML(paste0("<br/>", "<br/>",
                             "<i><strong><font color='red'> Proportion Analysis</font></strong></i>",
                             "<br/>", "<br/>","<br/>",
                             "<i>Example:</i> A scientist wants to test the hypothesis that a new combination treatment is associated with a higher proportion of mice having
@@ -116,7 +119,7 @@ ui <- tagList(
                       tags$a("Go to Proportion Analysis", onclick = "customHref('Page6');"),
     
                       fluidRow(
-                        column(8, HTML(paste0("<br/>", "<br/>",
+                        column(10, HTML(paste0("<br/>", "<br/>",
                             "<i><strong><font color='red'> Growth Curve Analysis</font></strong></i>",
                           "<br/>", "<br/>",
                           "<i>Example:</i> A scientist wants to test the hypothesis that a new treatment is able to slow down tumor growth.
@@ -167,7 +170,7 @@ ui <- tagList(
                                                       })</script>"),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>",
                                                             "An experiment is conducted to answer a particular research question, for instance, 
                                                             to investigate whether the outcome after a new treatment differs from the outcome after the standard treatment,
                                                             i.e. whether there is an effect of the new treatment. The research question is typically framed into a null hypothesis
@@ -177,11 +180,11 @@ ui <- tagList(
                                                             A researcher can make two types of correct decisions and two types of errors, which is shown in the table below.",
                                                             "<br/>","<br/>","<br/>")))),
                                                 
-                                                 tags$img(src = "images/HypothesisTest_table.PNG", width = "800px", height = "300px"),
+                                                 tags$img(src = "images/HypothesisTest_table2.PNG", width = "800px", height = "300px"),
                                                  
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0(
+                                                   column(10, HTML(paste0(
                                                    "<br/>","<br/>","<br/>",
                                                    "The effect either exists or not in nature, while the result of the statistical analysis is either significant or non-significant. Therefore, based on the statistical analysis, 
                                                    a researcher either makes a correct inference about the effect or a false one.  The type 1 error (\\(\\alpha\\)) is the probability of finding an 
@@ -194,7 +197,7 @@ ui <- tagList(
                                                  
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>",
                                                   "If there is a true effect of a treatment, researchers would like to detect it with high probability.
                                                    A power level of 0.8 or 0.9 is usually considered sufficient. For illustration, if 100 experiments are conducted with an existing true effect and
                                                   each experiment has a power of 0.8 (i.e., 80%), the statistical analyses would be significant for 80 experiments (and result in rejection of the
@@ -227,7 +230,7 @@ ui <- tagList(
                                                  tags$img(src = "images/Power_table.PNG", width = "800px", height = "300px"),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0(
+                                                   column(10, HTML(paste0(
                                                    "<br/>","<br/>",
                                                    "Assume a scientist develops and tests hypotheses so that a true effect exists (i.e., the null hypothesis is wrong) for half of her experiments (R=0.5).
                                                    If she chooses the sample sizes of 100 experiments so that power is 80%, she is expected to obtain significant tests for 40 of the 50 experiments with a true effect
@@ -237,7 +240,7 @@ ui <- tagList(
                                                  
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                              
                                                              "1.$$\\text{True positive rate} = \\frac{Power*R}{Power*R + (1-Power)*R} = Power$$",
                                                              "The probability of a significant result if the effect truly exists.",
@@ -253,7 +256,7 @@ ui <- tagList(
                                                              tags$img(src = "images/PPV_0.05.png", width = "800px", height = "500px"),
                                                              
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                              "4.$$\\text{False Positive Report Probability(FPRP)} = 1-PPV = \\frac{\\alpha*(1-R)}{Power*R + \\alpha*(1-R)}$$",
                                                              "The probability that there is no effect if the statistical test is significant.
                                                              As can be seen from the formula and the graph below, this probability decreases with increasing power and R.",
@@ -265,7 +268,7 @@ ui <- tagList(
                                                  
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>",
+                                                   column(10, HTML(paste0("<br/>", "<br/>", "<br/>",
                                                              "A false conclusion is either making a type 1 or type 2 error. The false conclusion rate can be determined by combining the type 1 and type 2 errors.
                                                               As is illustrated in the graph below, this rate decreases with increasing power and decreasing R.
                                                               Moreover, when the prior probability of the effect is maximum, i.e., R=1, then the false conclusion rate depends only on the power of the test. 
@@ -303,7 +306,7 @@ ui <- tagList(
                                                       })</script>"),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", 
+                                                   column(10, HTML(paste0("<br/>", "<br/>", 
                                                              "<i><strong><font color='red'>Statistical power depends on three factors</font></strong></i>",
                                                              "<br/>","<br/>","<br/>",
                                                              "To determine the power of an analysis we need firstly to specify the alternative hypothesis, \\(H_a\\), or in other words,
@@ -323,7 +326,7 @@ ui <- tagList(
                                                              "<br/>", "<br/>")))),
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>",
                                                              "<i>The correct sample size can be obtained through the following steps:</i>",
                                                              "<br/>","<br/>","<br/>",
                                                              "1. Formulate the research question, i.e., define clearly what the null hypothesis and the alternative
@@ -345,7 +348,7 @@ ui <- tagList(
                                                  ),
                                         tabPanel("Other Statistical issues", value = "tab3",
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>",
+                                                   column(10, HTML(paste0("<br/>", "<br/>", "<br/>",
                                                              "<i><strong><font color='red'>Multiple Comparisons</font></strong></i>",
                                                              "<br/>", "<br/>", "<br/>",
                                                              "When an experiment involves more than one comparison, i.e., more than one null hypothesis and
@@ -383,7 +386,7 @@ ui <- tagList(
                                                  
                                                  
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>", "<br/>", "<br/>","<br/>",
                                                                          "<i><strong><font color='red'>One-sided vs two-sided tests</font></strong></i>",
                                                                          "<br/>", "<br/>", 
                                                                          "Consider the example of a group of mice with food ad libitum and another group of similar mice with a severely restricted diet. 
@@ -410,7 +413,7 @@ ui <- tagList(
                                         
                                         tabPanel("References",
                                                  fluidRow(
-                                                   column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                   column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                              "<i><strong><font color='red'>REFERENCES</font></strong></i>")),
                                                  HTML("<br/>","<br/>"),
                                                  tags$a("The p value and the base rate fallacy", href = "https://www.statisticsdonewrong.com/p-value.html", target = "_blank"),
@@ -448,7 +451,7 @@ ui <- tagList(
                                       
                                       tabPanel("Basic information",
                                                fluidRow(
-                                                 column(8, HTML(paste0("<br/>","<br/>", "<br/>",
+                                                 column(10, HTML(paste0("<br/>","<br/>", "<br/>",
                                                            "T-test and Mann-Whitney-Wilcoxon tests compare the mean or median of an outcome variable between two groups while ANOVA and Kruskal-Wallis test compare 
                                                            more than two groups. T-test and ANOVA are parametric tests that rely on certain distributional assumptions to obtain reliable test results. 
                                                            Validation of these assumptions becomes impossible when group sizes are  small, which is the case with most animal experiments. 
@@ -465,7 +468,7 @@ ui <- tagList(
                                                            "<br/>","<br/>")))),
                                                
                                                fluidRow(
-                                                 column(8, HTML("More information about the Mann-Whitney-Wilcoxon test can be found "),
+                                                 column(10, HTML("More information about the Mann-Whitney-Wilcoxon test can be found "),
                                                     
                                                tags$a(href="http://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704_nonparametric/BS704_Nonparametric4.html", "here", target = "_blank")))
                                                           
@@ -476,7 +479,7 @@ ui <- tagList(
                                                            "<i><strong><font color='blue'>For 2 groups</font></strong></i>")),
                                                
                                                fluidRow(
-                                                 column(8, HTML("<br/>",
+                                                 column(10, HTML("<br/>",
                                                                 "A scientist wants to test the hypothesis that a novel compound reduces high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J strain of mice.
                                                                 Therefore, a new study is planned where mice will be  randomized to a control and a treatment group, in order to compare the average HDL cholesterol levels 
                                                                 between both groups. In an experiment, the following measurements of HDL were observed:",
@@ -486,7 +489,7 @@ ui <- tagList(
                                                  column(6, DTOutput("Example_1"))),
                                                
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>","<br/>",
+                                                 column(10, HTML("<br/>", "<br/>","<br/>",
                                                     "Analysis of such  data can be carried out using the GraphPad software and following the steps described "),
                                                     
                                                     tags$a(href="https://www.graphpad.com/guides/prism/7/statistics/index.htm?stat_how_to_do_an_unpaired_t_test_w_3.htm",
@@ -511,7 +514,7 @@ ui <- tagList(
                                                HTML("<i><strong><font color='blue'>For more than 2 groups</font></strong></i>"),
                                                
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "A scientist wants to test the hypothesis that two novel compounds reduce high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J 
+                                                 column(10, HTML("<br/>", "A scientist wants to test the hypothesis that two novel compounds reduce high-density lipoprotein (HDL) cholesterol levels in a transgenic C57Bl/6J 
                                                     strain of mice. Therefore a new study is planned where mice will be randomized to the two treatment groups and an untreated group, in order to compare the average HDL cholesterol 
                                                     levels between the three groups. During an experiment, the following measurements of HDL are observed:",
                                                     "<br/>", "<br/>","<br/>"))),
@@ -519,7 +522,7 @@ ui <- tagList(
                                                fluidRow(
                                                  column(6, DTOutput("Example_2"))),
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>",
+                                                 column(10, HTML("<br/>", "<br/>",
                                                     "For an experiment with more than two groups,  the required sample size can be calculated using information about  the two groups 
                                                     with the smallest difference between the average  outcome, i.e., HDL. If an experiment is powered for the smallest difference, 
                                                     it is also powered to detect a larger difference, but multiple comparisons should be taken into account (see "),
@@ -541,7 +544,7 @@ ui <- tagList(
                                                #tags$img(src = "images/PowerExample_WMW.PNG", width = "400px", height = "500px"),
                                                
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>",
+                                                 column(10, HTML("<br/>", "<br/>",
                                                     "Calculations of the required sample size can be performed under the Sample Size Calculation tab.  
                                                     For illustration, we will use  the examples described above."
                                                     ))),
@@ -642,7 +645,7 @@ ui <- tagList(
                                                tabsetPanel(
                                                  tabPanel("Basic information",
                                                           fluidRow(
-                                                            column(8,  HTML(paste0("<br/>","<br/>",
+                                                            column(10,  HTML(paste0("<br/>","<br/>",
                                                                   "The log-rank test is used to test the null hypothesis that the time to an event (e.g., death or a tumor exceeding a pre-defined volume)
                                                                   between groups of mice is equal. For each mouse, the survival time is measured from the start of the experiment, for example from the time of 
                                                                   randomization, until the mouse experiences the outcome of interest  or is sacrificed or the experiment ends. For mice that do not experience 
@@ -661,7 +664,7 @@ ui <- tagList(
                                                  
                                                  tabPanel("Example", value = 'Example_surv', 
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                            column(10, HTML(paste0("<br/>","<br/>",
                                                           "To evaluate whether the chemotherapeutic agent  paclitaxel improves survival after esophageal adenocarcinoma (EAC), 
                                                           a scientist uses a peritoneal dissemination xenograft mouse model and injects human EAC cell lines intraperitoneally
                                                           into severe combined immunodeficiency (SCID) mice. Two weeks later, the mice are randomly assigned to either 
@@ -680,7 +683,7 @@ ui <- tagList(
                                                                                   )),
 
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                            column(10, HTML(paste0("<br/>","<br/>",
                                                               "To calculate the sample size for a new experiment the following information is needed:",
                                                                "<br/>", "<br/>",
                                                                "<ol>
@@ -700,7 +703,7 @@ ui <- tagList(
                                                           
                                                           
                                                           fluidRow(
-                                                            column(8, HTML("<br/>", "<br/>",
+                                                            column(10, HTML("<br/>", "<br/>",
                                                                "Calculations of the required sample size can be performed using this website under the sample size calculation tab.
                                                                For illustration, we will use the example described above.",
                                                                "<br/>"))),
@@ -765,12 +768,12 @@ ui <- tagList(
                                                tabsetPanel( 
                                                  tabPanel("Basic information",
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                            column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                                         "When the outcome is binary, the comparison of groups is a comparison of proportions. 
                                                                         For example, after treatment, mice can have
                                                                         a complete response (coded as 1) or not complete response (coded as 0). This situation can be analyzed with a Z-test comparing the 
                                                                         proportions of responding mice between two different treatments. But because of the small sample sizes that are usually used
-                                                                        in mice experiments, it is more appropriate to use the <strong>Fisher's exact test</strong>",
+                                                                        in mice experiments, it is more appropriate to use <strong>Fisher's exact test</strong>",
                                                                         "<br/>","<br/>","<br/>"
                                                                                )))), 
                                                           
@@ -789,7 +792,7 @@ ui <- tagList(
                                                  
                                                tabPanel("Example", value = 'Example_prop',
                                                         fluidRow(
-                                                          column(8, HTML(paste0("<br/>","<br/>",
+                                                          column(10, HTML(paste0("<br/>","<br/>",
                                                                                 "A scientist wants to test the hypothesis that a new combination treatment leads to a higher proportion of tumor regression compared
                                                                                 with a standard treatment . Mice that do not have palpable tumors for 14 days are considered responders. The proportions of responders 
                                                                                 are compared between treatment groups. The data from an experiment are presented below.",
@@ -810,7 +813,7 @@ ui <- tagList(
                                                                         "here.", target = "_blank"))),
                                                                                 
                                                         fluidRow(
-                                                          column(8, HTML(paste0("<br/>","<br/>", 
+                                                          column(10, HTML(paste0("<br/>","<br/>", 
                                                                                 "To calculate the required sample size for a new similar experiment, 
                                                                                 the proportions of responding mice in control and treatment group need to be estimated from that data.")))),
                                                
@@ -820,7 +823,7 @@ ui <- tagList(
                                                
                                                
                                                fluidRow(
-                                                 column(8, HTML("<br/>", "<br/>","<br/>",
+                                                 column(10, HTML("<br/>", "<br/>","<br/>",
                                                                 "Calculations of the required sample size can be performed under the Sample Size Calculation tab.
                                                                 For illustration, we will use the example described above.",
                                                                 "<br/>", "<br/>","<br/>"))), 
@@ -853,7 +856,7 @@ ui <- tagList(
                                                           
                                                           mainPanel(HTML(paste0("<br/>","<br/>", "Information on how to use this online calculator is provided in the ",
                                                                          tags$a("Example", onclick = "customHref('Page6');customHref('Example_prop');"),
-                                                                         ". This is a simulation based calculation and therefore it might take few seconds depending on the input.")),
+                                                                         ". This is a simulation based calculation and therefore it might take a few seconds depending on the input.")),
                                                             
                                                             HTML("<br/>", "<br/>","<br/>", 
                                                                          "<strong><font color='#4d3a7d'>The proportions in two groups are expected to be </font></strong>"),
@@ -870,7 +873,7 @@ ui <- tagList(
                                                             uiOutput('Pdynamic_valueTEST', inline =T),   
                                                                     HTML("<strong><font color='#4d3a7d'>, the required sample size per group is: </font></strong>"),
                                                                     HTML("<br/>", "<br/>"),
-                                                                    withSpinner(verbatimTextOutput('resultsProp'))
+                                                                    withSpinner(verbatimTextOutput('resultsProp')), withSpinner(verbatimTextOutput('resultsProp2'))
                                                             
 
                                                         ))))),    
@@ -882,7 +885,7 @@ ui <- tagList(
                                                tabsetPanel( 
                                                  tabPanel("Basic information",
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                            column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                                     "In this type of experiments, tumor cells are injected into mice and the volume of the tumor is measured every 2-3 days.
                                                                     When the tumor reaches a certain volume, e.g. \\(200mm^3\\), mice are randomized into treatment and control groups.
                                                                     Tumor volume is regularly measured until mice die or are sacrificed. The objective is to compare the  tumor growth
@@ -894,7 +897,7 @@ ui <- tagList(
                                                           
                                                  tabPanel("Example", value = 'Example_growth',
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>","<br/>",
+                                                            column(10, HTML(paste0("<br/>","<br/>",
                                                                       "A scientist wants to test the hypothesis that a new treatment is able to suppress the tumor growth.  
                                                                       An experiment is conducted where tumor cells are injected into mice and volume of the  tumor is measured every 2-3 days.
                                                                       When tumors reach a pre-defined volume of \\(1500mm^3\\),  mice are randomized to receive either the standard treatment or the
@@ -907,12 +910,12 @@ ui <- tagList(
                                                                       "<br/>", "<br/>","<br/>")))),
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0(DTOutput("ExampleGC_1", width = "80%"),
+                                                            column(10, HTML(paste0(DTOutput("ExampleGC_1", width = "80%"),
                                                                                "<br/>", "<br/>","<br/>"))))
                                                           ,
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0(
+                                                            column(10, HTML(paste0(
                                                                       "Such data cannot be analyzed with Graphpad software, but SPSS software can be used instead.
                                                                       Installation of SPSS software can be requested from the IT department free of charge for NKI employees.",
                                                                       "<br/>", "<br/>",
@@ -922,12 +925,12 @@ ui <- tagList(
                                                                       
                                                             
                                                            fluidRow(
-                                                              column(8, DTOutput("ExampleGC_2", width = "80%")))
+                                                              column(10, DTOutput("ExampleGC_2", width = "80%")))
                                                           ,
                                                           
                                                           
                                                           fluidRow(
-                                                              column(8, HTML(paste0("<br/>","<br/>","<br/>",
+                                                              column(10, HTML(paste0("<br/>","<br/>","<br/>",
                                                                     "1. Loading data into SPSS: File -> Open -> Data",
                                                                     "<br/>", "<br/>","<br/>",
                                                                     "2. Creating a binary indicator variable ‘TreatmentGR’ with values 0 for control group and 1 for treatment group:",
@@ -942,19 +945,19 @@ ui <- tagList(
                                                                     
                                                                     "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example2.png", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example2.png", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example20.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example20.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example21.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example21.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>", "<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example200.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example200.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>",
                                                                     
@@ -965,11 +968,11 @@ ui <- tagList(
                                                                     
                                                                     "<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example24.png", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example24.png", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example23.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example23.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>",
                                                                     
@@ -982,25 +985,25 @@ ui <- tagList(
                                                                     Model Statistics: Parameter estimates for fixed effects -> Continue. ",
                                                                     "<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example25.png", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example25.png", width = "800px", height = "400px"),
                                                                     
                                                                   
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example26.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example26.PNG", width = "850px", height = "450px"),
                                                                   
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example27.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example27.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example28.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example28.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>","<br/>","<br/>","<br/>",
                                                                     
-                                                                    tags$img(src = "images/GLS_Example29.PNG", width = "700px", height = "300px"),
+                                                                    tags$img(src = "images/GLS_Example29.PNG", width = "800px", height = "400px"),
                                                                     
                                                                     "<br/>","<br/>","<br/>",
                                                                     
@@ -1033,7 +1036,7 @@ ui <- tagList(
                                                           ,
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0("More details on how to conduct <i>mixed-models analysis</i> in SPSS can be found ",
+                                                            column(10, HTML(paste0("More details on how to conduct <i>mixed-models analysis</i> in SPSS can be found ",
                                                           tags$a(href="https://stats.idre.ucla.edu/spss/seminars/spss-mixed-command/", "here", target = "_blank")
                                                           
                                                           )))),
@@ -1044,7 +1047,7 @@ ui <- tagList(
                                                           
                                                           
                                                           fluidRow(
-                                                            column(8, HTML(paste0("<br/>",
+                                                            column(10, HTML(paste0("<br/>",
                                                                                   
                                                            "The sample size required for this kind of experiment is computed from the sample size required for a simple linear regression  multiplied 
                                                            by a factor called <strong>design effect</strong>. This factor corrects for the correlation between measurements from the same mouse. The design effect
