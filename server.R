@@ -664,7 +664,7 @@ powr <- eventReactive(input$buttonPrInput,{
 
 output$resultsProp <- renderPrint({
   if(input$buttonPrInput){
-    isolate({powr()$SS})
+    isolate({ceiling(powr()$SS)})
   }
 })
 
