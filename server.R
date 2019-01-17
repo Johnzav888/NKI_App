@@ -540,8 +540,8 @@ powr <- eventReactive(input$buttonPrInput,{
     
     if(abs(prop1 - prop2) < 0.3 | isTRUE(all.equal(abs(prop1-prop2), 0.3))){
       
-      result <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
-                                    sig.level = input$error1InputP/100)$n)
+      result <- power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+                                    sig.level = input$error1InputP/100)$n
       ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
       
       
@@ -575,8 +575,8 @@ powr <- eventReactive(input$buttonPrInput,{
     
     if(abs(prop1 - prop2) < 0.25 | isTRUE(all.equal(abs(prop1-prop2), 0.25))){
       
-      result <- ceiling(power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
-                                    sig.level = input$error1InputP/100)$n)
+      result <- power.prop.test(p1 = prop1, p2 = prop2, power = input$Power1InputP/100,
+                                    sig.level = input$error1InputP/100)$n
       ss2 <- c(prop1, prop2,input$error1InputP, input$Power1InputP)
       
       
